@@ -1,1 +1,1 @@
-# image-waermarking
+# image-watermarking
