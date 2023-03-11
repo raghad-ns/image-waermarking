@@ -5,7 +5,7 @@ img = imread('LenaRGB.jpg');
 gray_img = rgb2gray(img);
 
 % convert the image to double precision
-img_double = im2double(img_gray);
+img_double = im2double(gray_img);
 
 % Apply 2D DCT to the grayscale image
 dct_data = dct2(img_double);
