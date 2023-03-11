@@ -22,7 +22,7 @@ seq = double(text);
 % Step 2: Apply DCT
 dct_seq = dct(seq);
 
-disp(seq);
+%disp(seq);
 % Step 3: Get magnitude and compress data range
 mag_seq = abs(dct_seq);
 log_mag_seq = log(mag_seq + 1);
@@ -41,7 +41,7 @@ title('DCT Magnitude');
 % Apply IDCT to retrieve text from DCT coefficients
 recovered_seq = idct(dct_seq);
 
-disp(recovered_seq);
+%disp(recovered_seq);
 % Convert sequence of numbers back to text
 recovered_text = char(round(recovered_seq));
 
