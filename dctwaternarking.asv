@@ -2,17 +2,17 @@
 img = imread('LenaRGB.jpg');
 
 % Convert the image into grayscale
-gray_img = rgb2gray(img);
+%gray_img = rgb2gray(img);
 
 % convert the image to double precision
-img_double = im2double(img_gray);
+img_double = im2double(img);
 
 % Apply 2D DCT to the grayscale image
 dct_data = dct2(img_double);
 imshow (dct_data);
 
 % Convert the text to a binary sequence using ASCII codes
-text = 'Raghad Dala';
+text = 'This is a watermark';
 binary_text = dec2bin(text, 8);
 binary_text = binary_text(:)' - '0';
 
@@ -57,4 +57,4 @@ img_gray = uint8(img_gray);
 
 % Invert the conversion of image to grayscale
 img_rgb = ind2rgb(img_gray, gray(256));
-imshow (img)
+imshow (img_rgb);
