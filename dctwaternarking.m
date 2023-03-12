@@ -25,7 +25,7 @@ text_dct = dct(text_double);
 text_norm = 2*text_dct/length(text_dct) - 1;
 
 % Embed the watermark into the DCT coefficients of the image
-alpha = 0.1; % Watermark strength
+alpha = 0.0001; % Watermark strength
 text_norm_resized = imresize(text_norm, [size(R_dct,1), size(R_dct,2)]);
 R_wm_dct = R_dct + alpha* text_norm_resized;
 G_wm_dct = G_dct + alpha* text_norm_resized;
