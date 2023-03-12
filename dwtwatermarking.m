@@ -1,5 +1,5 @@
 % Load the RGB image and separate its color channels
-img = imread('LenaRGB.jpg');
+img = imread('PeppersRGB.jpg');
 R = img(:,:,1);
 G = img(:,:,2);
 B = img(:,:,3);
@@ -23,7 +23,7 @@ text_double = double(text);
 text_c_resized = imresize(text_c, size(C));
 
 % Embed the watermark into the DWT coefficients of the image
-alpha = 0.0001; % Watermark strength
+alpha = 0.00027; % Watermark strength
 C_wm = C + alpha * text_c_resized;
 
 % Reconstruct the watermarked image
@@ -43,3 +43,13 @@ title('Original Image');
 subplot(1,2,2);
 imshow(img_wm);
 title('Watermarked Image');
+
+% Compute the MSE & PSNR between the two images
+img = im2double(img);
+img_wm = im2double(img_wm);
+
+psnr_value = psnr(img, img_wm);
+mse = immse(img, img_wm);
+
+fprintf('MSE between original and watermarked image: %f\n', mse);
+fprintf('MSE between original and watermarked image: %f\n', psnr_value);

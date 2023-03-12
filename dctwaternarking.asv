@@ -1,5 +1,5 @@
 % Load the RGB image and separate its color channels
-img = imread('PeppersRGB.jpg');
+img = imread('LenaRGB.jpg');
 R = img(:,:,1);
 G = img(:,:,2);
 B = img(:,:,3);
@@ -25,7 +25,7 @@ text_dct = dct(text_double);
 text_norm = 2*text_dct/length(text_dct) - 1;
 
 % Embed the watermark into the DCT coefficients of the image
-alpha = 0.00027; % Watermark strength
+alpha = 0.0001; % Watermark strength
 text_norm_resized = imresize(text_norm, [size(R_dct,1), size(R_dct,2)]);
 R_wm_dct = R_dct + alpha* text_norm_resized;
 G_wm_dct = G_dct + alpha* text_norm_resized;
@@ -42,12 +42,12 @@ img_wm = cat(3, R_wm, G_wm, B_wm);
 % Display the watermarked image
 imshow(img_wm);
 
-% Compute the MSE & PSNR between the two images
+% Compute the MSE between the two images
 img = im2double(img);
 img_wm = im2double(img_wm);
 
+% Calculate the PSNR
 psnr_value = psnr(img, img_wm);
 mse = immse(img, img_wm);
-
 fprintf('MSE between original and watermarked image: %f\n', mse);
-fprintf('MSE between original and watermarked image: %f\n', psnr_value);
+fprintf('MSE between original and watermarked image: %f\n', psnr);
