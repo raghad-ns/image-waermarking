@@ -1,36 +1,45 @@
-% Load the image and the text
+% Load the RGB image and separate its color channels
 img = imread('LenaRGB.jpg');
-text = 'raghad dala';
+R = img(:,:,1);
+G = img(:,:,2);
+B = img(:,:,3);
 
-% Convert the image to grayscale
-img_gray = rgb2gray(img);
+% Convert each color channel into double precision
+R_double = im2double(R);
+G_double = im2double(G);
+B_double = im2double(B);
 
 % Convert the image to the frequency domain using DWT
-[C,S] = wavedec2(img_gray, 1, 'haar');
-[H1,V1,D1] = detcoef2('all',C,S,1);
-A1 = appcoef2(C,S,'haar',1);
-imshow (A1);
+[C,S] = wavedec2(R_double, 1, 'haar');
 
-% Convert the text to a vector of ASCII codes and apply DWT
-text_arr = double(text);
-text_coeffs = dwt(text_arr,'haar');
+% Load the text to be embedded as a watermark and convert it to a numeric vector of double precision
+text = 'Raghad Dala';
+text_double = double(text);
 
-% Choose the coefficients to modify
-CD1 = D1(:);
-alpha = 0.1;
-for i = 1:length(text_coeffs)
-    if text_coeffs(i) > 0
-        CD1(i) = CD1(i) + alpha * abs(CD1(i));
-    else
-        CD1(i) = CD1(i) - alpha * abs(CD1(i));
-    end
-end
-D1_modified = reshape(CD1,size(D1));
+% Convert the text to the frequency domain using DWT
+[text_c, text_l] = wavedec(text_double, 1, 'haar');
 
-% Transform the modified coefficients back to the spatial domain
-C_new = [A1(:)', H1(:)', V1(:)', D1_modified(:)'];
-watermarked_img = waverec2(C_new,S,'haar');
-%imshow(watermarked_img)
+% Resize the text coefficients to match the size of C
+text_c_resized = imresize(text_c, size(C));
 
-% Save the watermarked image
-%imwrite(watermarked_img, 'watermarked_image.png');
+% Embed the watermark into the DWT coefficients of the image
+alpha = 0.0001; % Watermark strength
+C_wm = C + alpha * text_c_resized;
+
+% Reconstruct the watermarked image
+R_wm = waverec2(C_wm, S, 'haar');
+
+% Combine the watermarked color channels to obtain the watermarked RGB image
+img_wm = cat(3, R_wm, G_double, B_double);
+
+% Display the watermarked image
+%imshow(img_wm);
+
+% Display the original and watermarked images side by side
+figure;
+subplot(1,2,1);
+imshow(img);
+title('Original Image');
+subplot(1,2,2);
+imshow(img_wm);
+title('Watermarked Image');
