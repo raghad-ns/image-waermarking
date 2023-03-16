@@ -2,6 +2,28 @@ clc
 clear all
 close all 
 
+% Define a key
+myString = 'Hello, world!';
+
+% Convert the string into ASCII codes
+asciiCodes = uint8(myString);
+
+% Convert the ASCII codes into binary data
+binaryData = dec2bin(asciiCodes, 8);
+
+% Display the binary data
+disp(binaryData);
+
+% Traverse through each bit of the binary data
+for i = 1:numel(dec2bin(binaryData))
+    % Get the value of the ith bit in the binary data
+    bitValue = bitget(binaryData, i);
+    
+    % Do something with the bit value
+    disp(bitValue)
+end
+
+
 % Load the RGB image and separate its color channels
 img = imread('PeppersRGB.jpg');
 R = img(:,:,1);
