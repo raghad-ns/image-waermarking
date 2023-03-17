@@ -26,7 +26,6 @@ for i = 1:numel(binaryDataNum)
     disp(bitValue)
 end
 
-
 % Load the image
 img = imread('PeppersRGB.jpg');
 % Block size
@@ -36,22 +35,6 @@ blockSize = 8;
 padRows = blockSize - mod(size(img,1), blockSize);
 padCols = blockSize - mod(size(img,2), blockSize);
 img = padarray(img, [padRows padCols], 0, 'post');
-
-% divide image into blocks
-nBlocksRows = size(img, 1) / blockSize;
-nBlocksCols = size(img, 2) / blockSize;
-blocks = mat2cell(img, blockSize*ones(1,nBlocksRows), blockSize*ones(1,nBlocksCols), 3);
-
-
-% Display the blocks
-figure;
-for i = 1:nBlocksRows
-    for j = 1:nBlocksCols
-        idx = (i-1)*nBlocksCols + j;
-        subplot(nBlocksRows, nBlocksCols, idx);
-        imshow(blocks{i,j});
-    end
-end
 
 % Load the RGB image and separate its color channels
 
@@ -68,6 +51,23 @@ B_double = im2double(B);
 R_dct = dct2(R_double);
 G_dct = dct2(G_double);
 B_dct = dct2(B_double);
+
+% Divide the image into blocks
+[numRows, numCols] = size(R_dct);
+numBlocksRows = floor(numRows / blockSize);
+numBlocksCols = floor(numCols / blockSize);
+
+blocks_R = mat2cell(R_dct, blockSize*ones(1,numBlocksRows), blockSize*ones(1,numBlocksCols), 1);
+blocks_G = mat2cell(G_dct, blockSize*ones(1,numBlocksRows), blockSize*ones(1,numBlocksCols), 1);
+blocks_B = mat2cell(B_dct, blockSize*ones(1,numBlocksRows), blockSize*ones(1,numBlocksCols), 1);
+for i = 1:numBlocksRows
+    for j = 1:numBlocksCols
+        idx = (i-1)*numBlocksCols + j;
+        subplot(numBlocksRows, numBlocksCols, idx);
+       imshow(blocks_B{i,j});
+   end
+end
+
 
 % Load the text to be embedded as a watermark and convert it to a numeric vector of double precision
 text = 'Raghad Dala sajeda';

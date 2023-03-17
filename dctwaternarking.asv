@@ -9,23 +9,54 @@ myString = 'Hello, world!';
 asciiCodes = uint8(myString);
 
 % Convert the ASCII codes into binary data
-binaryData = dec2bin(asciiCodes, 8);
+binaryData = reshape(dec2bin(asciiCodes, 8).', 1, []);
 
-% Display the binary data
-disp(binaryData);
+% Convert the binary data to numeric array
+binaryDataNum = str2num(binaryData);
 
 % Traverse through each bit of the binary data
-for i = 1:numel(dec2bin(binaryData))
+for i = 1:numel(binaryDataNum)
+    % Cast the input to an integer data type
+    inputInt = int64(round(binaryDataNum(i)));
+    
     % Get the value of the ith bit in the binary data
-    bitValue = bitget(binaryData, i);
+    bitValue = bitget(inputInt, 1:8);
     
     % Do something with the bit value
     disp(bitValue)
 end
 
 
-% Load the RGB image and separate its color channels
+% Load the image
 img = imread('PeppersRGB.jpg');
+% Block size
+blockSize = 8; 
+
+% pad image to make its size evenly divisible by the block size
+padRows = blockSize - mod(size(img,1), blockSize);
+padCols = blockSize - mod(size(img,2), blockSize);
+img = padarray(img, [padRows padCols], 0, 'post');
+
+imshow(img)
+
+% divide image into blocks
+%nBlocksRows = size(img, 1) / blockSize;
+%nBlocksCols = size(img, 2) / blockSize;
+%blocks = mat2cell(img, blockSize*ones(1,nBlocksRows), blockSize*ones(1,nBlocksCols), 3);
+
+
+% Display the blocks
+%figure;
+%for i = 1:nBlocksRows
+%    for j = 1:nBlocksCols
+%        idx = (i-1)*nBlocksCols + j;
+%        subplot(nBlocksRows, nBlocksCols, idx);
+%       imshow(blocks{i,j});
+%   end
+%end
+
+% Load the RGB image and separate its color channels
+
 R = img(:,:,1);
 G = img(:,:,2);
 B = img(:,:,3);
@@ -39,6 +70,23 @@ B_double = im2double(B);
 R_dct = dct2(R_double);
 G_dct = dct2(G_double);
 B_dct = dct2(B_double);
+
+% Divide the image into blocks
+[numRows, numCols] = size(R_dct);
+numBlocksRows = floor(numRows / blockSize);
+numBlocksCols = floor(numCols / blockSize);
+
+blocks_R = mat2cell(R_dct, blockSize*ones(1,numBlocksRows), blockSize*ones(1,numBlocksCols), 1);
+blocks_G = mat2cell(G_dct, blockSize*ones(1,numBlocksRows), blockSize*ones(1,numBlocksCols), 1);
+blocks_B = mat2cell(B_dct, blockSize*ones(1,numBlocksRows), blockSize*ones(1,numBlocksCols), 1);
+for i = 1:numBlocksRows
+    for j = 1:numBlocksCols
+        idx = (i-1)*numBlocksCols + j;
+        subplot(numBlocksRows, numBlocksCols, idx);
+       imshow(blocks{i,j});
+   end
+end
+
 
 % Load the text to be embedded as a watermark and convert it to a numeric vector of double precision
 text = 'Raghad Dala sajeda';
@@ -66,6 +114,7 @@ R_wm = idct2(R_wm_dct);
 G_wm = idct2(G_wm_dct);
 B_wm = idct2(B_wm_dct);
 
+figure;
 % Combine the watermarked color channels to obtain the watermarked RGB image
 img_wm = cat(3, R_wm, G_wm, B_wm);
 
