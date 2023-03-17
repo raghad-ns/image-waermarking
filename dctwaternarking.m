@@ -74,13 +74,21 @@ disp(['The ASCII codes for the characters after DCT:  ' num2str(text_norm)]);
 for i = 1:numBlocksRows
     for j = 1:numBlocksCols
         idx = (i-1)*numBlocksCols + j;
-        R_block = blocks_R(i , j);
-        G_block = blocks_G(i , j);
-        B_block = blocks_B(i , j);
+        DC_R = blocks_R(i , j);
+        DC_G = blocks_G(i , j);
+        DC_B = blocks_B(i , j);
         %traverse over the block content to add the watermrk
-        for x=1:8
-           for y=1:8
-               %if (bit index == binKey element) add the watermark
+                % Step 4: Modify DC coefficient if key bit is 1
+        bit_index = (i-1)*numBlocksCols + j;
+        if binKey(bit_index) == 1
+            if binWatermark(bit_index) == 1
+                DC_R = DC_R + 1;
+                DC_G = DC_G + 1;
+                DC_B = DC_B + 1; 
+            else
+                DC_R = DC_R - 1;
+                DC_G = DC_G - 1;
+                DC_B = DC_B - 1;
            end
         end
         subplot(numBlocksRows, numBlocksCols, idx);
