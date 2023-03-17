@@ -2,29 +2,18 @@ clc
 clear all
 close all 
 
-% Define a key
-myString = 'Hello, world!';
+% Define the key
+key = 'hello world!';
 
-% Convert the string into ASCII codes
-asciiCodes = uint8(myString);
+% Convert the key to binary data
+binKey = dec2bin(uint8(key), 8);
 
-% Convert the ASCII codes into binary data
-binaryData = reshape(dec2bin(asciiCodes, 8).', 1, []);
+% Reshape the binary data into a 2D array with 6 columns
+binKey = reshape(binKey', [], 3);
 
-% Convert the binary data to numeric array
-binaryDataNum = str2num(binaryData);
-
-% Traverse through each bit of the binary data
-for i = 1:numel(binaryDataNum)
-    % Cast the input to an integer data type
-    inputInt = int64(round(binaryDataNum(i)));
-    
-    % Get the value of the ith bit in the binary data
-    bitValue = bitget(inputInt, 1:8);
-    
-    % Do something with the bit value
-    disp(bitValue)
-end
+% Convert the binary data to numeric data
+numKey = bin2dec(binKey);
+disp (numKey);
 
 % Load the image
 img = imread('PeppersRGB.jpg');
@@ -60,9 +49,40 @@ numBlocksCols = floor(numCols / blockSize);
 blocks_R = mat2cell(R_dct, blockSize*ones(1,numBlocksRows), blockSize*ones(1,numBlocksCols), 1);
 blocks_G = mat2cell(G_dct, blockSize*ones(1,numBlocksRows), blockSize*ones(1,numBlocksCols), 1);
 blocks_B = mat2cell(B_dct, blockSize*ones(1,numBlocksRows), blockSize*ones(1,numBlocksCols), 1);
+
+% Load the text to be embedded as a watermark and convert it to a numeric vector of double precision
+text = 'Raghad Dala sajeda';
+text_double = double(text);
+
+% Convert the watermark to binary data
+binWatermark = dec2bin(uint8(key), 8);
+
+% Reshape the binary data into array 
+binWatermark = reshape(binWatermark', [], 1);
+
+% Display the ASCII codes
+disp(['The ASCII codes for the characters in the our name are:  ' num2str(text_double)]);
+
+% Compute the DCT coefficients of the text
+ text_dct = dct(text_double);
+
+% Normalize the DCT coefficients of the text to the range [-1, 1]
+text_norm = 2*text_dct/length(text_dct) - 1;
+disp(['The ASCII codes for the characters after DCT:  ' num2str(text_norm)]);
+
+%Embed the watermark into the host image
 for i = 1:numBlocksRows
     for j = 1:numBlocksCols
         idx = (i-1)*numBlocksCols + j;
+        R_block = blocks_R(i , j);
+        G_block = blocks_G(i , j);
+        B_block = blocks_B(i , j);
+        %traverse over the block content to add the watermrk
+        for x=1:8
+           for y=1:8
+               %if (bit index == binKey element) add the watermark
+           end
+        end
         subplot(numBlocksRows, numBlocksCols, idx);
        imshow(blocks_B{i,j});
    end
