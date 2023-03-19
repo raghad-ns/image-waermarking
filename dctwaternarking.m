@@ -13,7 +13,7 @@ binKey = reshape(binKey', [], 3);
 
 % Convert the binary data to numeric data
 numKey = bin2dec(binKey);
-disp (numKey);
+% disp (numKey);
 
 % Load the image
 img = imread('PeppersRGB.jpg');
@@ -70,6 +70,7 @@ disp(['The ASCII codes for the characters in the our name are:  ' num2str(text_d
 text_norm = 2*text_dct/length(text_dct) - 1;
 disp(['The ASCII codes for the characters after DCT:  ' num2str(text_norm)]);
 
+
 %Embed the watermark into the host image
 for i = 1:numBlocksRows
     for j = 1:numBlocksCols
@@ -80,7 +81,7 @@ for i = 1:numBlocksRows
         %traverse over the block content to add the watermrk
                 % Step 4: Modify DC coefficient if key bit is 1
         bit_index = (i-1)*numBlocksCols + j;
-        if binKey(bit_index) == 1
+        if bit_index <= numel(binKey) && binKey(bit_index) == 1
             if binWatermark(bit_index) == 1
                 DC_R = DC_R + 1;
                 DC_G = DC_G + 1;
@@ -91,7 +92,7 @@ for i = 1:numBlocksRows
                 DC_B = DC_B - 1;
            end
         end
-        subplot(numBlocksRows, numBlocksCols, idx);
+       subplot(numBlocksRows, numBlocksCols, idx);
        imshow(blocks_B{i,j});
    end
 end
@@ -142,6 +143,17 @@ img_wm = im2double(img_wm);
 
 psnr_value = psnr(img, img_wm);
 mse = immse(img, img_wm);
+
+
+
+
+
+
+
+
+
+
+
 
 fprintf('MSE between original and watermarked image: %f\n', mse);
 fprintf('PSNR between original and watermarked image: %f\n', psnr_value);
