@@ -16,7 +16,7 @@ numKey = bin2dec(binKey);
 % disp (numKey);
 
 % Load the image
-img = imread('PeppersRGB.jpg');
+img = imread('LenaRGB.jpg');
 % Block size
 blockSize = 8; 
 
@@ -124,4 +124,21 @@ for i = 1:numBlocksRows
     end
 end
 
+% Combine the blocks back into an image
+R_dct = cell2mat(blocks_R);
+G_dct = cell2mat(blocks_G);
+B_dct = cell2mat(blocks_B);
 
+% Compute the inverse DCT of each color channel
+R_idct = idct2(R_dct);
+G_idct = idct2(G_dct);
+B_idct = idct2(B_dct);
+
+% Combine the color channels into an RGB image
+img_wm = cat(3, R_idct, G_idct, B_idct);
+
+% Remove the padding
+img_wm = img_wm(1:end-padRows, 1:end-padCols, :);
+%display the watermarked image 
+figure;
+imshow(img_wm);
