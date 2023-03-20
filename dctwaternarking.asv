@@ -50,16 +50,6 @@ blocks_R = mat2cell(R_dct, blockSize*ones(1,numBlocksRows), blockSize*ones(1,num
 blocks_G = mat2cell(G_dct, blockSize*ones(1,numBlocksRows), blockSize*ones(1,numBlocksCols), 1);
 blocks_B = mat2cell(B_dct, blockSize*ones(1,numBlocksRows), blockSize*ones(1,numBlocksCols), 1);
 
-figure;
-title('Host Image')
-for i = 1:numBlocksRows
-    for j = 1:numBlocksCols
-        idx = (i-1)*numBlocksCols + j;
-        subplot(numBlocksRows, numBlocksCols, idx);
-        imshow(blocks_R{i,j});
-    end
-end
-
 % Load the text to be embedded as a watermark and convert it to a numeric vector of double precision
 text = 'Raghad Dala sajeda';
 text_double = double(text);
@@ -81,8 +71,7 @@ text_norm = 2*text_dct/length(text_dct) - 1;
 disp(['The ASCII codes for the characters after DCT:  ' num2str(text_norm)]);
 
 
-% Traverse through each block and each bit in the block, and embed the
-% watermark
+% Traverse through each block and each bit in the block, and modify the bit as needed
 
 keyIndex = 2;
 watermarkIndex = 1 ;
@@ -94,7 +83,7 @@ for i = 1:numBlocksRows
         
         for k = 1:blockSize
             for l = 1:blockSize
-                if keyIndex == k & keyIndex == (l + 1) & keyIndex <= size(numKey) & watermarkIndex <= size(binWatermark)
+                if keyIndex == k && keyIndex == (l + 1) && keyIndex <= size(numKey) && watermarkIndex <= size(binWatermark)
                     % Modify the bit at (k,l) in block_R
                     block_R(k,l) = modify_bit(block_R(k,l) , binWatermark(watermarkIndex));
                 
@@ -114,14 +103,5 @@ for i = 1:numBlocksRows
     end
 end
 
-figure;
-title ('Watermarked Image')
-for i = 1:numBlocksRows
-    for j = 1:numBlocksCols
-        idx = (i-1)*numBlocksCols + j;
-        subplot(numBlocksRows, numBlocksCols, idx);
-        imshow(blocks_R{i,j});
-    end
-end
-
+f
 
