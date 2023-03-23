@@ -3,7 +3,7 @@ clear all
 close all 
 
 % Define the key
-key = 'hello world !!!!! hello world !!!!!!';
+key = 'hello world!';
 
 % Convert the key to binary data
 binKey = dec2bin(uint8(key), 8);
@@ -16,7 +16,7 @@ numKey = bin2dec(binKey);
 % disp (numKey);
 
 % Load the image
-img = imread('PeppersRGB.jpg');
+img = imread('output.jpg');
 % Block size
 blockSize = 8; 
 
@@ -60,37 +60,16 @@ for i = 1:numBlocksRows
     end
 end
 
-% Load the text to be embedded as a watermark and convert it to a numeric vector of double precision
-text = 'Raghad';
-text_double = double(text);
+% Create an empty binary array with 0 rows and 0 columns for watermark
+binaryWm = false(1 , 0);
 
-% Convert the watermark to binary data
-binWatermark = dec2bin(uint8(text), 8);
+% Push items to the binary array
+%binaryWm(end+1) = true;
 
-
-% Reshape the binary data into array 
-binWatermark = reshape(binWatermark', [], 1);
-
-% Display the ASCII codes
-disp(['The ASCII codes for the characters in the our name are:  ' num2str(text_double)]);
-
-% Compute the DCT coefficients of the text
- text_dct = dct(text_double);
-
-% Normalize the DCT coefficients of the text to the range [-1, 1]
-text_norm = 2*text_dct/length(text_dct) - 1;
-disp(['The ASCII codes for the characters after DCT:  ' num2str(text_norm)]);
-disp('key size : ');
-disp(size(numKey));
-disp('watermark size : ');
-disp(size(binWatermark));
-
-
-% Traverse through each block and each bit in the block, and embed the
+% Traverse through each block and each bit in the block, and extract the
 % watermark
+
 keyIndex = 2;
-watermarkIndex = 1;
-% Main code starts here
 for i = 1:numBlocksRows
     for j = 1:numBlocksCols
         block_R = blocks_R{i,j};
@@ -99,31 +78,18 @@ for i = 1:numBlocksRows
         
         for k = 1:blockSize
             for l = 1:blockSize
-                if keyIndex == k && keyIndex == (l + 1) && keyIndex <= numel(numKey) && watermarkIndex <= numel(binWatermark)
-                    disp('bit added here');
-                    % Modify the bit at (k,l) in block_R
-                    block_R(k,l) = modify_bit(block_R(k,l) , binWatermark(watermarkIndex));
-                
-                    % Modify the bit at (k,l) in block_G
-                    block_G(k,l) = modify_bit(block_G(k,l) , binWatermark(watermarkIndex));
-                
-                    % Modify the bit at (k,l) in block_B
-                    block_B(k,l) = modify_bit(block_B(k,l) , binWatermark(watermarkIndex));
-                    
-                    %update keyIndex & watermarkIndex 
-                    keyIndex = keyIndex + 2 ;
-                    watermarkIndex = watermarkIndex + 1 ;
+                if keyIndex == k & keyIndex == (l + 1) & keyIndex <= size(numKey)
+                    % the logic to extract the watermark
+                    if (block_R(k , l))
+                        binarayWm = append 
+                    binaryWm(end+1) = block_R(k , l);
                 end
             end
         end
-        
-        % Assign the modified block back to the cell array
-        blocks_R{i,j} = block_R;
-        blocks_G{i,j} = block_G;
-        blocks_B{i,j} = block_B;
     end
 end
-disp (watermarkIndex);
+
+disp(size(binaryWm));
 
 figure;
 title ('Watermarked Image')
@@ -150,22 +116,7 @@ img_wm = cat(3, R_idct, G_idct, B_idct);
 
 % Remove the padding
 img_wm = img_wm(1:end-padRows, 1:end-padCols, :);
+
 %display the watermarked image 
 figure;
 imshow(img_wm);
-imwrite(img_wm, 'output.jpg', 'jpg');
-
-
-% function definition for modify_bit
-function y = modify_bit(x, b)
-    LSB = bitget(uint8(floor(x)), 1);
-    if LSB == b
-        y = x;
-    else
-        if b == 0
-            y = x - 1;
-        else
-            y = x + 1;
-        end
-    end
-end

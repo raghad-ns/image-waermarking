@@ -100,7 +100,6 @@ for i = 1:numBlocksRows
         for k = 1:blockSize
             for l = 1:blockSize
                 if keyIndex == k && keyIndex == (l + 1) && keyIndex <= numel(numKey) && watermarkIndex <= numel(binWatermark)
-                    disp('bit added here');
                     % Modify the bit at (k,l) in block_R
                     block_R(k,l) = modify_bit(block_R(k,l) , binWatermark(watermarkIndex));
                 
@@ -123,7 +122,7 @@ for i = 1:numBlocksRows
         blocks_B{i,j} = block_B;
     end
 end
-disp (watermarkIndex);
+disp (keyIndex);
 
 figure;
 title ('Watermarked Image')
@@ -158,14 +157,15 @@ imwrite(img_wm, 'output.jpg', 'jpg');
 
 % function definition for modify_bit
 function y = modify_bit(x, b)
-    LSB = bitget(uint8(floor(x)), 1);
-    if LSB == b
+    if mod(x,2) == b
         y = x;
-    else
-        if b == 0
-            y = x - 1;
-        else
-            y = x + 1;
-        end
+    elseif x == 0 && b == 1
+        y = 1;
+    elseif x == 1 && b == 0
+        y = 0;
+    elseif mod(x,2) == 0 && b == 1
+        y = x + 1;
+    elseif mod(x,2) == 1 && b == 0
+        y = x - 1;
     end
 end
