@@ -60,11 +60,16 @@ for i = 1:numBlocksRows
     end
 end
 
+% Create an empty binary array with 0 rows and 0 columns for watermark
+binaryWm = logical([]);
+
+% Push items to the binary array
+%binaryWm(end+1) = true;
+
 % Traverse through each block and each bit in the block, and extract the
 % watermark
 
 keyIndex = 2;
-watermarkIndex = 1 ;
 for i = 1:numBlocksRows
     for j = 1:numBlocksCols
         block_R = blocks_R{i,j};
@@ -75,11 +80,14 @@ for i = 1:numBlocksRows
             for l = 1:blockSize
                 if keyIndex == k & keyIndex == (l + 1) & keyIndex <= size(numKey)
                     % the logic to extract the watermark
+                    binaryWm(end+1) = block_R(k , l);
                 end
             end
         end
     end
 end
+
+disp(size(binaryWm));
 
 figure;
 title ('Watermarked Image')

@@ -3,7 +3,7 @@ clear all
 close all 
 
 % Define the key
-key = 'hello world!';
+key = 'hello world !!!!! hello world !!!!!!';
 
 % Convert the key to binary data
 binKey = dec2bin(uint8(key), 8);
@@ -16,7 +16,7 @@ numKey = bin2dec(binKey);
 % disp (numKey);
 
 % Load the image
-img = imread('LenaRGB.jpg');
+img = imread('PeppersRGB.jpg');
 % Block size
 blockSize = 8; 
 
@@ -61,11 +61,12 @@ for i = 1:numBlocksRows
 end
 
 % Load the text to be embedded as a watermark and convert it to a numeric vector of double precision
-text = 'RDS';
+text = 'Raghad';
 text_double = double(text);
 
 % Convert the watermark to binary data
-binWatermark = dec2bin(uint8(key), 8);
+binWatermark = dec2bin(uint8(text), 8);
+
 
 % Reshape the binary data into array 
 binWatermark = reshape(binWatermark', [], 1);
@@ -79,6 +80,10 @@ disp(['The ASCII codes for the characters in the our name are:  ' num2str(text_d
 % Normalize the DCT coefficients of the text to the range [-1, 1]
 text_norm = 2*text_dct/length(text_dct) - 1;
 disp(['The ASCII codes for the characters after DCT:  ' num2str(text_norm)]);
+disp('key size : ');
+disp(size(numKey));
+disp('watermark size : ');
+disp(size(binWatermark));
 
 
 % Traverse through each block and each bit in the block, and embed the
@@ -103,6 +108,10 @@ for i = 1:numBlocksRows
                 
                     % Modify the bit at (k,l) in block_B
                     block_B(k,l) = modify_bit(block_B(k,l) , binWatermark(watermarkIndex));
+                    
+                    %update keyIndex & watermarkIndex 
+                    keyIndex = keyIndex + 2 ;
+                    watermarkIndex = watermarkIndex + 1 ;
                 end
             end
         end
