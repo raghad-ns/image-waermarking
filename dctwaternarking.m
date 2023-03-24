@@ -80,10 +80,10 @@ disp(['The ASCII codes for the characters in the our name are:  ' num2str(text_d
 % Normalize the DCT coefficients of the text to the range [-1, 1]
 text_norm = 2*text_dct/length(text_dct) - 1;
 disp(['The ASCII codes for the characters after DCT:  ' num2str(text_norm)]);
-disp('key size : ');
-disp(size(numKey));
-disp('watermark size : ');
-disp(size(binWatermark));
+for i = 1 : numel(numKey)
+    numKey(i) = numKey(i) + 1 ;
+end
+disp(numKey);
 
 
 % Traverse through each block and each bit in the block, and embed the
@@ -99,7 +99,7 @@ for i = 1:numBlocksRows
         
         for k = 1:blockSize
             for l = 1:blockSize
-                if keyIndex == k && keyIndex == (l + 1) && keyIndex <= numel(numKey) && watermarkIndex <= numel(binWatermark)
+                if keyIndex <= numel(numKey) && numKey(keyIndex) == k && numKey(keyIndex - 1) == l && watermarkIndex <= numel(binWatermark)
                     disp('bit added here');
                     % Modify the bit at (k,l) in block_R
                     block_R(k,l) = modify_bit(block_R(k,l) , binWatermark(watermarkIndex));
