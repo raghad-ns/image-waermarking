@@ -66,16 +66,12 @@ end
 binaryWm = false(0 , 1);
 
 % Push items to the binary array
-%binaryWm  = [binaryWm , true];
+binaryWm  = [binaryWm , true];
 
 % Traverse through each block and each bit in the block, and embed the
 % watermark
-% Initialize variables
 keyIndex = 2;
-watermarkIndex = 1;
-extractedBits = '';
-
-% Traverse through each block and extract embedded bits
+% Main code starts here
 for i = 1:numBlocksRows
     for j = 1:numBlocksCols
         block_R = blocks_R{i,j};
@@ -85,29 +81,20 @@ for i = 1:numBlocksRows
         for k = 1:blockSize
             for l = 1:blockSize
                 if keyIndex <= numel(numKey) && numKey(keyIndex) == k && numKey(keyIndex - 1) == l
-                    % Extract the bit at (k,l) from block_R
-                    extractedBits = [extractedBits, num2str(bitget(uint8(block_R(k,l)),1))];
-
-                    % Extract the bit at (k,l) from block_G
-                    %extractedBits = [extractedBits, num2str(bitget(uint8(block_G(k,l)),1))];
-                
-                    % Extract the bit at (k,l) from block_B
-                    %extractedBits = [extractedBits, num2str(bitget(uint8(block_B(k,l)),1))];
-                    
-                    %update keyIndex & watermarkIndex 
+                    disp('bit added here');
                     keyIndex = keyIndex + 2 ;
-                    watermarkIndex = watermarkIndex + 1 ;
+                    if(block_R(k , l) == 1)
+                        binaryWm = [binaryWm , true];
+                    else
+                        bi
                 end
             end
         end
+     
     end
 end
 
-% Convert the extracted bits to the original watermark
-disp(extractedBits);
-extractedWatermark = bin2text(extractedBits);
-
-disp(extractedWatermark);
+disp(keyIndex);
 
 figure;
 title ('Watermarked Image')
@@ -138,15 +125,3 @@ img_wm = img_wm(1:end-padRows, 1:end-padCols, :);
 %display the watermarked image 
 figure;
 imshow(img_wm);
-
-function text = bin2text(binaryStr)
-    % Convert the binary string to a character array
-    binaryArray = reshape(binaryStr, 8, [])';
-    
-    % Convert each row of the binary array to a decimal value
-    decimalValues = bin2dec(binaryArray);
-    
-    % Convert the decimal values to characters
-    text = char(decimalValues)';
-end
-

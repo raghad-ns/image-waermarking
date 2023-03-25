@@ -83,8 +83,6 @@ disp(['The ASCII codes for the characters after DCT:  ' num2str(text_norm)]);
 for i = 1 : numel(numKey)
     numKey(i) = numKey(i) + 1 ;
 end
-disp(numKey);
-
 
 % Traverse through each block and each bit in the block, and embed the
 % watermark
@@ -101,14 +99,15 @@ for i = 1:numBlocksRows
             for l = 1:blockSize
                 if keyIndex <= numel(numKey) && numKey(keyIndex) == k && numKey(keyIndex - 1) == l && watermarkIndex <= numel(binWatermark)
                     disp('bit added here');
+                    watermarkBit = binWatermark(watermarkIndex);
                     % Modify the bit at (k,l) in block_R
-                    block_R(k,l) = modify_bit(block_R(k,l) , binWatermark(watermarkIndex));
-                
+                    block_R(k,l) = bitset(reshape(uint8(block_R), 1, 64), 1, watermarkBit);
+
                     % Modify the bit at (k,l) in block_G
-                    block_G(k,l) = modify_bit(block_G(k,l) , binWatermark(watermarkIndex));
+                    block_G(k,l) = bitset(uint8(block_G(k,l)), 1, watermarkBit);
                 
                     % Modify the bit at (k,l) in block_B
-                    block_B(k,l) = modify_bit(block_B(k,l) , binWatermark(watermarkIndex));
+                    block_B(k,l) = bitset(uint8(block_B(k,l)), 1, watermarkBit);
                     
                     %update keyIndex & watermarkIndex 
                     keyIndex = keyIndex + 2 ;
@@ -123,7 +122,7 @@ for i = 1:numBlocksRows
         blocks_B{i,j} = block_B;
     end
 end
-disp (watermarkIndex);
+disp (binWatermark);
 
 figure;
 title ('Watermarked Image')
