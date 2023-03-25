@@ -98,16 +98,20 @@ for i = 1:numBlocksRows
         for k = 1:blockSize
             for l = 1:blockSize
                 if keyIndex <= numel(numKey) && numKey(keyIndex) == k && numKey(keyIndex - 1) == l && watermarkIndex <= numel(binWatermark)
-                    disp('bit added here');
-                    watermarkBit = binWatermark(watermarkIndex);
+                    %disp(block_R(k , l));
+                    watermarkBit =uint8(binWatermark(watermarkIndex));
                     % Modify the bit at (k,l) in block_R
-                    block_R(k,l) = bitset(reshape(uint8(block_R), 1, 64), 1, watermarkBit);
+                    %block_R_int = uint8(block_R); % Cast to integer type
+                    %block_R_bitset = bitset(reshape(block_R_int, 1, 64), 1, watermarkBit); % Apply bitset
+                    %block_R_int_modified = typecast(uint8(block_R_bitset), 'uint8'); % Convert back to integer type
+
+                    %block_R(k,l) = bitset(reshape(uint8(block_R), 1, 64), 1, watermarkBit);
 
                     % Modify the bit at (k,l) in block_G
                     block_G(k,l) = bitset(uint8(block_G(k,l)), 1, watermarkBit);
                 
                     % Modify the bit at (k,l) in block_B
-                    block_B(k,l) = bitset(uint8(block_B(k,l)), 1, watermarkBit);
+                    %block_B(k,l) = bitset(uint8(block_B(k,l)), 1, watermarkBit);
                     
                     %update keyIndex & watermarkIndex 
                     keyIndex = keyIndex + 2 ;
@@ -122,7 +126,6 @@ for i = 1:numBlocksRows
         blocks_B{i,j} = block_B;
     end
 end
-disp (binWatermark);
 
 figure;
 title ('Watermarked Image')

@@ -86,7 +86,7 @@ for i = 1:numBlocksRows
             for l = 1:blockSize
                 if keyIndex <= numel(numKey) && numKey(keyIndex) == k && numKey(keyIndex - 1) == l
                     % Extract the bit at (k,l) from block_R
-                    extractedBits = [extractedBits, num2str(bitget(uint8(block_R(k,l)),1))];
+                    extractedBits = [extractedBits, num2str(bitget(uint8(block_G(k,l)),1))];
 
                     % Extract the bit at (k,l) from block_G
                     %extractedBits = [extractedBits, num2str(bitget(uint8(block_G(k,l)),1))];
