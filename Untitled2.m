@@ -156,7 +156,7 @@ img_wm = img_wm(1:end-padRows, 1:end-padCols, :);
 %display the watermarked image 
 figure;
 imshow(img_wm);
-imwrite(img_wm, 'output.jpg', 'jpg');
+imwrite(img_wm, 'watermarked_dwt.jpg', 'jpg');
 
 
 % function definition for modify_bit
