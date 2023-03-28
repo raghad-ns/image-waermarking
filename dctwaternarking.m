@@ -101,14 +101,24 @@ for i = 1:numBlocksRows
                     %disp(block_R(k , l));
                     watermarkBit =uint8(binWatermark(watermarkIndex));
                     % Modify the bit at (k,l) in block_R
-                    %block_R_int = uint8(block_R); % Cast to integer type
-                    %block_R_bitset = bitset(reshape(block_R_int, 1, 64), 1, watermarkBit); % Apply bitset
-                    %block_R_int_modified = typecast(uint8(block_R_bitset), 'uint8'); % Convert back to integer type
+                    block_R_int = uint8(block_R); % Cast to integer type
+                    block_R_bitset = bitset(reshape(block_R_int, 1, 64), 1, watermarkBit); % Apply bitset
+                    block_R_int_modified = typecast(uint8(block_R_bitset), 'uint8'); % Convert back to integer type
+                    
+                    % Modify the bit at (k,l) in block_G
+                    block_G_int = uint8(block_G); % Cast to integer type
+                    block_G_bitset = bitset(reshape(block_R_int, 1, 64), 1, watermarkBit); % Apply bitset
+                    block_G_int_modified = typecast(uint8(block_G_bitset), 'uint8'); % Convert back to integer type
+                    
+                    % Modify the bit at (k,l) in block_B
+                    block_B_int = uint8(block_B); % Cast to integer type
+                    block_B_bitset = bitset(reshape(block_B_int, 1, 64), 1, watermarkBit); % Apply bitset
+                    block_B_int_modified = typecast(uint8(block_B_bitset), 'uint8'); % Convert back to integer type
 
                     %block_R(k,l) = bitset(reshape(uint8(block_R), 1, 64), 1, watermarkBit);
 
                     % Modify the bit at (k,l) in block_G
-                    block_G(k,l) = bitset(uint8(block_G(k,l)), 1, watermarkBit);
+                    %block_G(k,l) = bitset(uint8(block_G(k,l)), 1, watermarkBit);
                 
                     % Modify the bit at (k,l) in block_B
                     %block_B(k,l) = bitset(uint8(block_B(k,l)), 1, watermarkBit);

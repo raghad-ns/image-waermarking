@@ -52,30 +52,11 @@ blocks_R = mat2cell(R_dct, blockSize*ones(1,numBlocksRows), blockSize*ones(1,num
 blocks_G = mat2cell(G_dct, blockSize*ones(1,numBlocksRows), blockSize*ones(1,numBlocksCols), 1);
 blocks_B = mat2cell(B_dct, blockSize*ones(1,numBlocksRows), blockSize*ones(1,numBlocksCols), 1);
 
-figure;
-title('Host Image')
-for i = 1:numBlocksRows
-    for j = 1:numBlocksCols
-        idx = (i-1)*numBlocksCols + j;
-        subplot(numBlocksRows, numBlocksCols, idx);
-        imshow(blocks_R{i,j});
-    end
-end
-
-% Create an empty binary array with 0 rows and 0 columns for watermark
-binaryWm = false(0 , 1);
-
-% Push items to the binary array
-%binaryWm  = [binaryWm , true];
-
-% Traverse through each block and each bit in the block, and embed the
-% watermark
-% Initialize variables
+% Initialize variables for the extracted watermark
+extractedWatermark = '';
 keyIndex = 2;
-watermarkIndex = 1;
-extractedBits = '';
 
-% Traverse through each block and extract embedded bits
+% Iterate over each block
 for i = 1:numBlocksRows
     for j = 1:numBlocksCols
         block_R = blocks_R{i,j};
@@ -85,59 +66,22 @@ for i = 1:numBlocksRows
         for k = 1:blockSize
             for l = 1:blockSize
                 if keyIndex <= numel(numKey) && numKey(keyIndex) == k && numKey(keyIndex - 1) == l
-                    % Extract the bit at (k,l) from block_R
-                    extractedBits = [extractedBits, num2str(bitget(uint8(block_G(k,l)),1))];
-
-                    % Extract the bit at (k,l) from block_G
-                    %extractedBits = [extractedBits, num2str(bitget(uint8(block_G(k,l)),1))];
-                
-                    % Extract the bit at (k,l) from block_B
-                    %extractedBits = [extractedBits, num2str(bitget(uint8(block_B(k,l)),1))];
-                    
-                    %update keyIndex & watermarkIndex 
-                    keyIndex = keyIndex + 2 ;
-                    watermarkIndex = watermarkIndex + 1 ;
+                    % Extract the least significant bit from the current pixel value in block_R
+                    watermarkBit = bitget(uint8(block_R(k, l)), 1);
+                    % Append the watermark bit to the extractedWatermark string
+                    extractedWatermark = strcat(extractedWatermark, num2str(watermarkBit));
+                    % Update keyIndex
+                    keyIndex = keyIndex + 2;
                 end
             end
         end
     end
 end
 
-% Convert the extracted bits to the original watermark
-disp(extractedBits);
-extractedWatermark = bin2text(extractedBits);
+% Convert the binary string to the original watermark message
+%extractedMessage = binaryVectorToASCII(extractedWatermark);
 
 disp(extractedWatermark);
-
-figure;
-title ('Watermarked Image')
-for i = 1:numBlocksRows
-    for j = 1:numBlocksCols
-        idx = (i-1)*numBlocksCols + j;
-        subplot(numBlocksRows, numBlocksCols, idx);
-        imshow(blocks_R{i,j});
-    end
-end
-
-% Combine the blocks back into an image
-R_dct = cell2mat(blocks_R);
-G_dct = cell2mat(blocks_G);
-B_dct = cell2mat(blocks_B);
-
-% Compute the inverse DCT of each color channel
-R_idct = idct2(R_dct);
-G_idct = idct2(G_dct);
-B_idct = idct2(B_dct);
-
-% Combine the color channels into an RGB image
-img_wm = cat(3, R_idct, G_idct, B_idct);
-
-% Remove the padding
-img_wm = img_wm(1:end-padRows, 1:end-padCols, :);
-
-%display the watermarked image 
-figure;
-imshow(img_wm);
 
 function text = bin2text(binaryStr)
     % Convert the binary string to a character array
@@ -148,5 +92,14 @@ function text = bin2text(binaryStr)
     
     % Convert the decimal values to characters
     text = char(decimalValues)';
+end
+
+function asciiMsg = binaryVectorToASCII(binaryMsg)
+    % Convert the binary message to a matrix
+    binaryMat = reshape(binaryMsg, 8, length(binaryMsg)/8)';
+    % Convert each row of the binary matrix to decimal
+    decimalMat = bi2de(binaryMat);
+    % Convert the decimal matrix to ASCII
+    asciiMsg = char(decimalMat)';
 end
 
