@@ -8,11 +8,14 @@ key = 'hello world !!!!! hello world !!!!!!';
 % Convert the key to binary data
 binKey = dec2bin(uint8(key), 8);
 
-% Reshape the binary data into a 2D array with 3 columns
+% Reshape the binary data into a 2D array with 6 columns
 binKey = reshape(binKey', [], 3);
 
 % Convert the binary data to numeric data
-numKey = bin2dec(binKey) + 1;
+numKey = bin2dec(binKey);
+for i = 1 : numel(numKey)
+    numKey(i) = numKey(i) + 1 ;
+end
 
 % Load the image
 img = imread('output.jpg');
@@ -45,15 +48,16 @@ B_dct = dct2(B_double);
 numBlocksRows = floor(numRows / blockSize);
 numBlocksCols = floor(numCols / blockSize);
 
-blocks_R = mat2cell(R_dct, blockSize*ones(1,numBlocksRows), blockSize*ones(1,numBlocksCols));
-blocks_G = mat2cell(G_dct, blockSize*ones(1,numBlocksRows), blockSize*ones(1,numBlocksCols));
-blocks_B = mat2cell(B_dct, blockSize*ones(1,numBlocksRows), blockSize*ones(1,numBlocksCols));
+blocks_R = mat2cell(R_dct, blockSize*ones(1,numBlocksRows), blockSize*ones(1,numBlocksCols), 1);
+blocks_G = mat2cell(G_dct, blockSize*ones(1,numBlocksRows), blockSize*ones(1,numBlocksCols), 1);
+blocks_B = mat2cell(B_dct, blockSize*ones(1,numBlocksRows), blockSize*ones(1,numBlocksCols), 1);
 
-% Initialize variables for the extracted watermark
-extractedWatermark = '';
-keyIndex = 2;
+% Initialize variables
+watermarkIndex = 1;
+keyIndex = 2 ;
+extractedBits = [];
 
-% Iterate over each block
+% Main code starts here
 for i = 1:numBlocksRows
     for j = 1:numBlocksCols
         block_R = blocks_R{i,j};
@@ -62,23 +66,45 @@ for i = 1:numBlocksRows
         
         for k = 1:blockSize
             for l = 1:blockSize
-                if keyIndex <= numel(numKey) && numKey(keyIndex) == k && numKey(keyIndex - 1) == l
-                    % Extract the least significant bit from the current pixel value in block_R
-                    watermarkBit = bitget(uint8(block_R(k, l)), 1);
-                    % Append the watermark bit to the extractedWatermark string
-                    extractedWatermark = strcat(extractedWatermark, num2str(watermarkBit));
-                    % Update keyIndex
-                    keyIndex = keyIndex + 2;
+                if keyIndex <= numel(numKey) && numKey(keyIndex) == k && numKey(keyIndex - 1) == l && watermarkIndex <= numel(binWatermark)
+                % Extract the bit at (k,l) from block_R
+                block_R_int = uint8(block_R); % Cast to integer type
+                watermarkBit = bitget(reshape(block_R_int, 1, 64), 1); % Extract the least significant bit
+                extractedBits(end+1) = watermarkBit; % Store the extracted bit
+                watermarkIndex = watermarkIndex + 1;
+                
+                % Extract the bit at (k,l) from block_G
+                block_G_int = uint8(block_G); % Cast to integer type
+                watermarkBit = bitget(reshape(block_G_int, 1, 64), 1); % Extract the least significant bit
+                extractedBits(end+1) = watermarkBit; % Store the extracted bit
+                watermarkIndex = watermarkIndex + 1;
+                
+                % Extract the bit at (k,l) from block_B
+                block_B_int = uint8(block_B); % Cast to integer type
+                watermarkBit = bitget(reshape(block_B_int, 1, 64), 1); % Extract the least significant bit
+                extractedBits(end+1) = watermarkBit; % Store the extracted bit
+                watermarkIndex = watermarkIndex + 1;
                 end
             end
         end
     end
 end
 
-% Convert the binary string to the original watermark message
-extractedMessage = bin2text(extractedWatermark);
+% Convert the extracted bitstream to a character array
+extractedWatermark = char(bi2de(reshape(extractedBits, 8, numel(extractedBits)/8).', 'left-msb').');
+if watermarkIndex-1 ~= expectedNumBits
+    disp("Error: The number of extracted bits does not match the expected number of bits.")
+else
+    % Convert the extracted bitstream to a character array
+    extractedWatermark = char(bi2de(reshape(extractedBits, 8, numel(extractedBits)/8).', 'left-msb').');
+end
+disp(extractedBits);
+disp(extractedWatermark);
 
-disp(extractedMessage);
+% Convert the binary string to the original watermark message
+%extractedMessage = binaryVectorToASCII(extractedWatermark);
+
+%disp(extractedWatermark);
 
 function text = bin2text(binaryStr)
     % Convert the binary string to a character array
@@ -89,5 +115,14 @@ function text = bin2text(binaryStr)
     
     % Convert the decimal values to characters
     text = char(decimalValues)';
-    disp(
 end
+
+function asciiMsg = binaryVectorToASCII(binaryMsg)
+    % Convert the binary message to a matrix
+    binaryMat = reshape(binaryMsg, 8, length(binaryMsg)/8)';
+    % Convert each row of the binary matrix to decimal
+    decimalMat = bi2de(binaryMat);
+    % Convert the decimal matrix to ASCII
+    asciiMsg = char(decimalMat)';
+end
+

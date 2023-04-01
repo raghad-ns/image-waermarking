@@ -51,7 +51,6 @@ numBlocksCols = floor(numCols / blockSize);
 blocks_R = mat2cell(R_dct, blockSize*ones(1,numBlocksRows), blockSize*ones(1,numBlocksCols), 1);
 blocks_G = mat2cell(G_dct, blockSize*ones(1,numBlocksRows), blockSize*ones(1,numBlocksCols), 1);
 blocks_B = mat2cell(B_dct, blockSize*ones(1,numBlocksRows), blockSize*ones(1,numBlocksCols), 1);
-
 % Initialize variables for the extracted watermark
 extractedWatermark = '';
 keyIndex = 2;
@@ -67,7 +66,8 @@ for i = 1:numBlocksRows
             for l = 1:blockSize
                 if keyIndex <= numel(numKey) && numKey(keyIndex) == k && numKey(keyIndex - 1) == l
                     % Extract the least significant bit from the current pixel value in block_R
-                    watermarkBit = bitget(uint8(block_R(k, l)), 1);
+                    block_R_int = uint8(block_R); % Cast to integer type
+                    watermarkBit = bitget(uint8(block_R_int(k, l)), 1);
                     % Append the watermark bit to the extractedWatermark string
                     extractedWatermark = strcat(extractedWatermark, num2str(watermarkBit));
                     % Update keyIndex
@@ -82,6 +82,7 @@ end
 %extractedMessage = binaryVectorToASCII(extractedWatermark);
 
 disp(extractedWatermark);
+disp(size(extractedWatermark));
 
 function text = bin2text(binaryStr)
     % Convert the binary string to a character array

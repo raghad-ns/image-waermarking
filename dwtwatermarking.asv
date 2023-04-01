@@ -163,13 +163,15 @@ B_dwt = cell2mat(blocks_B);
 
 
 % Perform IDWT using the Haar wavelet on each color channel
-R_idwt = idwt2(R_dwt, 'haar');
-G_idwt = idwt2(G_dwt, 'haar');
-B_idwt = idwt2(B_dwt, 'haar');
+for i = 1:size(img, 3)
+    img_idwt(:,:,i) = idwt2(img_dwt(:,:,i), 'haar');
+end
+
+
+
 
 % Combine the color channels into an RGB image
-img_idwt = cat(3, R_idwt, G_idwt, B_idwt);
-
+img_wm = cat(3, R_idwt, G_idwt, B_idwt);
 
 % Remove the padding
 img_wm = img_wm(1:end-padRows, 1:end-padCols, :);

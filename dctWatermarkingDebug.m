@@ -1,8 +1,6 @@
-
-
 clc
 clear all
-close all
+close all 
 
 % Define the key
 key = 'hello world !!!!! hello world !!!!!!';
@@ -20,7 +18,7 @@ numKey = bin2dec(binKey);
 % Load the image
 img = imread('PeppersRGB.jpg');
 % Block size
-blockSize = 8;
+blockSize = 8; 
 
 % pad image to make its size evenly divisible by the block size
 padRows = blockSize - mod(size(img,1), blockSize);
@@ -38,35 +36,28 @@ R_double = im2double(R);
 G_double = im2double(G);
 B_double = im2double(B);
 
-% Compute the DWT coefficients of each color channel
-R_dwt = dwt2(R_double, 'haar');
-G_dwt = dwt2(G_double, 'haar');
-B_dwt = dwt2(B_double, 'haar');
+% Compute the DCT coefficients of each color channel
+R_dct = dct2(R_double);
+G_dct = dct2(G_double);
+B_dct = dct2(B_double);
 
 % Divide the image into blocks
-[numRows, numCols] = size(R_dwt);
-
+[numRows, numCols] = size(R_dct);
 numBlocksRows = floor(numRows / blockSize);
 numBlocksCols = floor(numCols / blockSize);
-R_dwt = R_dwt(1:numBlocksRows*blockSize, 1:numBlocksCols*blockSize);
-G_dwt = G_dwt(1:numBlocksRows*blockSize, 1:numBlocksCols*blockSize);
-B_dwt = B_dwt(1:numBlocksRows*blockSize, 1:numBlocksCols*blockSize);
 
-blocks_R = mat2cell(R_dwt, blockSize*ones(1,numBlocksRows), blockSize*ones(1,numBlocksCols));
-blocks_G = mat2cell(G_dwt, blockSize*ones(1,numBlocksRows), blockSize*ones(1,numBlocksCols));
-blocks_B = mat2cell(B_dwt, blockSize*ones(1,numBlocksRows), blockSize*ones(1,numBlocksCols));
-
-
-
+blocks_R = mat2cell(R_dct, blockSize*ones(1,numBlocksRows), blockSize*ones(1,numBlocksCols), 1);
+blocks_G = mat2cell(G_dct, blockSize*ones(1,numBlocksRows), blockSize*ones(1,numBlocksCols), 1);
+blocks_B = mat2cell(B_dct, blockSize*ones(1,numBlocksRows), blockSize*ones(1,numBlocksCols), 1);
 
 figure;
 title('Host Image')
 for i = 1:numBlocksRows
-for j = 1:numBlocksCols
-idx = (i-1)*numBlocksCols + j;
-subplot(numBlocksRows, numBlocksCols, idx);
-%imshow(blocks_R{i,j});
-end
+    for j = 1:numBlocksCols
+        idx = (i-1)*numBlocksCols + j;
+        subplot(numBlocksRows, numBlocksCols, idx);
+        imshow(blocks_R{i,j});
+    end
 end
 
 % Load the text to be embedded as a watermark and convert it to a numeric vector of double precision
@@ -76,27 +67,42 @@ text_double = double(text);
 % Convert the watermark to binary data
 binWatermark = dec2bin(uint8(text), 8);
 
-% Reshape the binary data into array
+
+% Reshape the binary data into array 
 binWatermark = reshape(binWatermark', [], 1);
 
-% Display the ASCII codes
-disp(['The ASCII codes for the characters in the our name are: ' num2str(text_double)]);
 
-% Compute the DWT coefficients of the text
-text_dwt = dwt(text_double, 'haar');
+% Compute the DCT coefficients of the text
+ text_dct = dct(text_double);
 
-% Normalize the DWT coefficients of the text to the range [-1, 1]
-text_norm = text_dwt / max(abs(text_dwt));
-disp(['The ASCII codes for the characters after DWT: ' num2str(text_norm)]);
+% Normalize the DCT coefficients of the text to the range [-1, 1]
+text_norm = 2*text_dct/length(text_dct) - 1;
 for i = 1 : numel(numKey)
-numKey(i) = numKey(i) + 1 ;
+    numKey(i) = numKey(i) + 1 ;
 end
+
+
+keyIndex = 2;
+block_R = blocks_R{1,1};
+block_R_int = uint8(block_R); % Cast to integer type
+disp(block_R_int);
+for k = 1:blockSize
+    for l = 1:blockSize
+        if keyIndex <= numel(numKey) && numKey(keyIndex) == k && numKey(keyIndex - 1) == l 
+            disp(numKey(keyIndex));
+            disp(numKey(keyIndex-1));
+            pixel_R_new = bitset(block_R_int(k,l), 1, 1); 
+            block_R_int(k,l) = pixel_R_new;
+        end
+    end
+end
+           
+disp("after embedding : ");
+disp(block_R_int);
 
 % Traverse through each block and each bit in the block, and embed the
 % watermark
-keyIndex = 2;
 watermarkIndex = 1;
-
 % Main code starts here
 for i = 1:numBlocksRows
     for j = 1:numBlocksCols
@@ -115,23 +121,15 @@ for i = 1:numBlocksRows
                     block_R_int_modified = typecast(uint8(block_R_bitset), 'uint8'); % Convert back to integer type
                     
                     % Modify the bit at (k,l) in block_G
-                    block_G_int = uint8(block_G); % Cast to integer type
-                    block_G_bitset = bitset(reshape(block_G_int, 1, 64), 1, watermarkBit); % Apply bitset
-                    block_G_int_modified = typecast(uint8(block_G_bitset), 'uint8'); % Convert back to integer type
+                    %block_G_int = uint8(block_G); % Cast to integer type
+                    %block_G_bitset = bitset(reshape(block_G_int, 1, 64), 1, watermarkBit); % Apply bitset
+                    %block_G_int_modified = typecast(uint8(block_G_bitset), 'uint8'); % Convert back to integer type
                     
                     % Modify the bit at (k,l) in block_B
-                    block_B_int = uint8(block_B); % Cast to integer type
-                    block_B_bitset = bitset(reshape(block_B_int, 1, 64), 1, watermarkBit); % Apply bitset
-                    block_B_int_modified = typecast(uint8(block_B_bitset), 'uint8'); % Convert back to integer type
+                    %block_B_int = uint8(block_B); % Cast to integer type
+                    %block_B_bitset = bitset(reshape(block_B_int, 1, 64), 1, watermarkBit); % Apply bitset
+                    %block_B_int_modified = typecast(uint8(block_B_bitset), 'uint8'); % Convert back to integer type
 
-                    %block_R(k,l) = bitset(reshape(uint8(block_R), 1, 64), 1, watermarkBit);
-
-                    % Modify the bit at (k,l) in block_G
-                    %block_G(k,l) = bitset(uint8(block_G(k,l)), 1, watermarkBit);
-                
-                    % Modify the bit at (k,l) in block_B
-                    %block_B(k,l) = bitset(uint8(block_B(k,l)), 1, watermarkBit);
-                    
                     %update keyIndex & watermarkIndex 
                     keyIndex = keyIndex + 2 ;
                     watermarkIndex = watermarkIndex + 1 ;
@@ -157,26 +155,24 @@ for i = 1:numBlocksRows
 end
 
 % Combine the blocks back into an image
-R_dwt = cell2mat(blocks_R);
-G_dwt = cell2mat(blocks_G);
-B_dwt = cell2mat(blocks_B);
+R_dct = cell2mat(blocks_R);
+G_dct = cell2mat(blocks_G);
+B_dct = cell2mat(blocks_B);
 
-
-% Perform IDWT using the Haar wavelet on each color channel
-R_idwt = idwt2(R_dwt, 'haar');
-G_idwt = idwt2(G_dwt, 'haar');
-B_idwt = idwt2(B_dwt, 'haar');
+% Compute the inverse DCT of each color channel
+R_idct = idct2(R_dct);
+G_idct = idct2(G_dct);
+B_idct = idct2(B_dct);
 
 % Combine the color channels into an RGB image
-img_idwt = cat(3, R_idwt, G_idwt, B_idwt);
-
+img_wm = cat(3, R_idct, G_idct, B_idct);
 
 % Remove the padding
 img_wm = img_wm(1:end-padRows, 1:end-padCols, :);
 %display the watermarked image 
 figure;
 imshow(img_wm);
-imwrite(img_wm, 'watermarked_dwt.jpg', 'jpg');
+imwrite(img_wm, 'output.jpg', 'jpg');
 
 
 % function definition for modify_bit

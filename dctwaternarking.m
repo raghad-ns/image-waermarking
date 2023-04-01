@@ -88,6 +88,7 @@ end
 % watermark
 keyIndex = 2;
 watermarkIndex = 1;
+disp(blocks_R(1,1));
 % Main code starts here
 for i = 1:numBlocksRows
     for j = 1:numBlocksCols
@@ -98,31 +99,11 @@ for i = 1:numBlocksRows
         for k = 1:blockSize
             for l = 1:blockSize
                 if keyIndex <= numel(numKey) && numKey(keyIndex) == k && numKey(keyIndex - 1) == l && watermarkIndex <= numel(binWatermark)
-                    %disp(block_R(k , l));
-                    watermarkBit =uint8(binWatermark(watermarkIndex));
-                    % Modify the bit at (k,l) in block_R
                     block_R_int = uint8(block_R); % Cast to integer type
-                    block_R_bitset = bitset(reshape(block_R_int, 1, 64), 1, watermarkBit); % Apply bitset
-                    block_R_int_modified = typecast(uint8(block_R_bitset), 'uint8'); % Convert back to integer type
-                    
-                    % Modify the bit at (k,l) in block_G
-                    block_G_int = uint8(block_G); % Cast to integer type
-                    block_G_bitset = bitset(reshape(block_G_int, 1, 64), 1, watermarkBit); % Apply bitset
-                    block_G_int_modified = typecast(uint8(block_G_bitset), 'uint8'); % Convert back to integer type
-                    
-                    % Modify the bit at (k,l) in block_B
-                    block_B_int = uint8(block_B); % Cast to integer type
-                    block_B_bitset = bitset(reshape(block_B_int, 1, 64), 1, watermarkBit); % Apply bitset
-                    block_B_int_modified = typecast(uint8(block_B_bitset), 'uint8'); % Convert back to integer type
-
-                    %block_R(k,l) = bitset(reshape(uint8(block_R), 1, 64), 1, watermarkBit);
-
-                    % Modify the bit at (k,l) in block_G
-                    %block_G(k,l) = bitset(uint8(block_G(k,l)), 1, watermarkBit);
-                
-                    % Modify the bit at (k,l) in block_B
-                    %block_B(k,l) = bitset(uint8(block_B(k,l)), 1, watermarkBit);
-                    
+                    watermarkBit =uint8(binWatermark(watermarkIndex));
+                    pixel_R_new = bitset(block_R_int(k,l), 1, watermarkBit); 
+                    block_R_int(k,l) = pixel_R_new;
+                    block_R = double(block_R_int);
                     %update keyIndex & watermarkIndex 
                     keyIndex = keyIndex + 2 ;
                     watermarkIndex = watermarkIndex + 1 ;
