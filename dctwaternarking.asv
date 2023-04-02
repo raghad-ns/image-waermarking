@@ -46,9 +46,9 @@ B_dct = dct2(B_double);
 numBlocksRows = floor(numRows / blockSize);
 numBlocksCols = floor(numCols / blockSize);
 
-blocks_R = mat2cell(R_dct, blockSize*ones(1,numBlocksRows), blockSize*ones(1,numBlocksCols), 1);
-blocks_G = mat2cell(G_dct, blockSize*ones(1,numBlocksRows), blockSize*ones(1,numBlocksCols), 1);
-blocks_B = mat2cell(B_dct, blockSize*ones(1,numBlocksRows), blockSize*ones(1,numBlocksCols), 1);
+blocks_R = mat2cell(R, blockSize*ones(1,numBlocksRows), blockSize*ones(1,numBlocksCols), 1);
+%blocks_G = mat2cell(G_dct, blockSize*ones(1,numBlocksRows), blockSize*ones(1,numBlocksCols), 1);
+%blocks_B = mat2cell(B_dct, blockSize*ones(1,numBlocksRows), blockSize*ones(1,numBlocksCols), 1);
 
 figure;
 title('Host Image')
@@ -91,27 +91,26 @@ watermarkIndex = 1;
 % Main code starts here
 for i = 1:numBlocksRows
     for j = 1:numBlocksCols
-        block_R = blocks_R{i,j};
-        block_G = blocks_G{i,j};
-        block_B = blocks_B{i,j};
-        
+        % Convert each color channel into double precision
+        R_double = im2double(blocks_R{i , j});
+
+        % Compute the DCT coefficients of each color channel
+        R_dct = dct2(R_double);
+        block_R = R_dct;
+        %block_G = blocks_G{i,j};
+        %block_B = blocks_B{i,j};
+        block_R_int = uint8(block_R); % Cast to integer type
         for k = 1:blockSize
             for l = 1:blockSize
                 if keyIndex <= numel(numKey) && numKey(keyIndex) == k && numKey(keyIndex - 1) == l && watermarkIndex <= numel(binWatermark)
-                    block_R = blocks_R{1,1};
-                    block_R_int = uint8(block_R); % Cast to integer type
-                    pixel_R_new = bitset(block_R_int(k,l), 1, 1); 
+                    newBit = uint8 (binWatermark(watermarkIndex) ;
+                    pixel_R_new = bitset(block_R_int(k,l), 1, newBit); 
                     block_R_int(k,l) = pixel_R_new;
                     block_R = double(block_R_int);
-                    blocks_R{1,1} = block_R;
+                    blocks_R{i,j} = block_R;
                 end
             end
         end
-        
-        % Assign the modified block back to the cell array
-        blocks_R{i,j} = block_R;
-        blocks_G{i,j} = block_G;
-        blocks_B{i,j} = block_B;
     end
 end
 
