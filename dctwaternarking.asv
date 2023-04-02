@@ -71,19 +71,18 @@ binWatermark = dec2bin(uint8(text), 8);
 % Reshape the binary data into array 
 binWatermark = reshape(binWatermark', [], 1);
 
+% Display the ASCII codes
+disp(['The ASCII codes for the characters in the our name are:  ' num2str(text_double)]);
 
 % Compute the DCT coefficients of the text
  text_dct = dct(text_double);
 
 % Normalize the DCT coefficients of the text to the range [-1, 1]
 text_norm = 2*text_dct/length(text_dct) - 1;
+disp(['The ASCII codes for the characters after DCT:  ' num2str(text_norm)]);
 for i = 1 : numel(numKey)
     numKey(i) = numKey(i) + 1 ;
 end
-
-block_R = blocks_R{i,j};
-block_R_int = uint8(block_R); % Cast to integer type
-block_R_in = reshape(
 
 % Traverse through each block and each bit in the block, and embed the
 % watermark
@@ -99,26 +98,12 @@ for i = 1:numBlocksRows
         for k = 1:blockSize
             for l = 1:blockSize
                 if keyIndex <= numel(numKey) && numKey(keyIndex) == k && numKey(keyIndex - 1) == l && watermarkIndex <= numel(binWatermark)
-                    %disp(block_R(k , l));
-                    watermarkBit =uint8(binWatermark(watermarkIndex));
-                    % Modify the bit at (k,l) in block_R
+                    block_R = blocks_R{1,1};
                     block_R_int = uint8(block_R); % Cast to integer type
-                    block_R_bitset = bitset(reshape(block_R_int, 1, 64), 1, watermarkBit); % Apply bitset
-                    block_R_int_modified = typecast(uint8(block_R_bitset), 'uint8'); % Convert back to integer type
-                    
-                    % Modify the bit at (k,l) in block_G
-                    %block_G_int = uint8(block_G); % Cast to integer type
-                    %block_G_bitset = bitset(reshape(block_G_int, 1, 64), 1, watermarkBit); % Apply bitset
-                    %block_G_int_modified = typecast(uint8(block_G_bitset), 'uint8'); % Convert back to integer type
-                    
-                    % Modify the bit at (k,l) in block_B
-                    %block_B_int = uint8(block_B); % Cast to integer type
-                    %block_B_bitset = bitset(reshape(block_B_int, 1, 64), 1, watermarkBit); % Apply bitset
-                    %block_B_int_modified = typecast(uint8(block_B_bitset), 'uint8'); % Convert back to integer type
-
-                    %update keyIndex & watermarkIndex 
-                    keyIndex = keyIndex + 2 ;
-                    watermarkIndex = watermarkIndex + 1 ;
+                    pixel_R_new = bitset(block_R_int(k,l), 1, 1); 
+                    block_R_int(k,l) = pixel_R_new;
+                    block_R = double(block_R_int);
+                    blocks_R{1,1} = block_R;
                 end
             end
         end

@@ -88,33 +88,24 @@ end
 % watermark
 keyIndex = 2;
 watermarkIndex = 1;
-disp(blocks_R(1,1));
 % Main code starts here
 for i = 1:numBlocksRows
     for j = 1:numBlocksCols
         block_R = blocks_R{i,j};
         block_G = blocks_G{i,j};
         block_B = blocks_B{i,j};
-        
+        block_R_int = uint8(block_R); % Cast to integer type
         for k = 1:blockSize
             for l = 1:blockSize
                 if keyIndex <= numel(numKey) && numKey(keyIndex) == k && numKey(keyIndex - 1) == l && watermarkIndex <= numel(binWatermark)
-                    block_R_int = uint8(block_R); % Cast to integer type
-                    watermarkBit =uint8(binWatermark(watermarkIndex));
-                    pixel_R_new = bitset(block_R_int(k,l), 1, watermarkBit); 
+                    newBit = uint8 (binWatermark(watermarkIndex)) ;
+                    pixel_R_new = bitset(block_R_int(k,l), 1, newBit); 
                     block_R_int(k,l) = pixel_R_new;
                     block_R = double(block_R_int);
-                    %update keyIndex & watermarkIndex 
-                    keyIndex = keyIndex + 2 ;
-                    watermarkIndex = watermarkIndex + 1 ;
+                    blocks_R{i,j} = block_R;
                 end
             end
         end
-        
-        % Assign the modified block back to the cell array
-        blocks_R{i,j} = block_R;
-        blocks_G{i,j} = block_G;
-        blocks_B{i,j} = block_B;
     end
 end
 
