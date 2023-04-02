@@ -1,7 +1,9 @@
 clc
 close all
+
 %host
-rgbimage=imread('PeppersRGB.jpg');
+
+rgbimage=imread('host.jpg');
 figure;
 imshow(rgbimage);
 title('Original color image');
@@ -13,8 +15,10 @@ blue1=img(:,:,3);
 [U_imgr1,S_imgr1,V_imgr1]= svd(red1);
 [U_imgg1,S_imgg1,V_imgg1]= svd(green1);
 [U_imgb1,S_imgb1,V_imgb1]= svd(blue1);
+
 %watermark
-rgbimage=imread('watermarked.jpg');
+
+rgbimage=imread('watermark.jpg');
 figure;
 imshow(rgbimage);
 title('Watermark image');
@@ -26,16 +30,24 @@ blue2=img_wat(:,:,3);
 [U_imgr2,S_imgr2,V_imgr2]= svd(red2);
 [U_imgg2,S_imgg2,V_imgg2]= svd(green2);
 [U_imgb2,S_imgb2,V_imgb2]= svd(blue2);
+
+
 % watermarking
+
 S_wimgr=S_imgr1+(0.10*S_imgr2);
 S_wimgg=S_imgg1+(0.10*S_imgg2);
 S_wimgb=S_imgb1+(0.10*S_imgb2);
+
+
 wimgr = U_imgr1*S_wimgr*V_imgr1';
 wimgg = U_imgg1*S_wimgg*V_imgg1';
 wimgb = U_imgb1*S_wimgb*V_imgb1';
+
 wimg=cat(3,wimgr,wimgg,wimgb);
 newhost_LL=wimg;
+
 %output
+
 rgb2=idwt2(newhost_LL,h_LH,h_HL,h_HH,'haar');
 imwrite(uint8(rgb2),'Watermarked.jpg');
 figure;imshow(uint8(rgb2));title('Watermarked Image');
