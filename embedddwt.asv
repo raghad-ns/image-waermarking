@@ -70,14 +70,14 @@ wimg = cat(3, wimgr, wimgg, wimgb);
 newhost_LL = wimg;
 newhost_LH = wimg;
 newhost_HL = wimg;
-newhost_HH = wimg;
+newhost_ = wimg;
 
 % Reconstruct the watermarked image by performing inverse DWT on the 
 % watermarked low-low frequency coefficients along with the original 
 % low-high, high-low, and high-high frequency coefficients
-rgb2=idwt2(newhost_LH,h_LL,h_HL,h_HH,'haar');
+rgb2=idwt2(newhost_LL,h_LH,h_HL,h_HH,'haar');
 
-watermarked = cat(3, h_LL, newhost_LH, h_HL, h_HH);
+watermarked = cat(3, newhost_LL, h_LH, h_HL, h_HH);
 
 imwrite(uint8(rgb2),'Watermarked.jpg');
 figure;
