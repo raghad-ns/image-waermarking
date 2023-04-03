@@ -83,14 +83,3 @@ imwrite(uint8(rgb2),'Watermarked.jpg');
 figure;
 imshow(uint8(rgb2));
 title('Watermarked Image');
-
-% Load the watermarked image
-
-
-% Adjust the contrast and brightness of the watermarked image
-watermarked_adjusted = imadjust(uint8(rgb2), [0 1], [0.2 0.8]);
-
-% Display the adjusted watermarked image
-figure;
-imshow(watermarked_adjusted);
-title('Adjusted Watermarked Image');

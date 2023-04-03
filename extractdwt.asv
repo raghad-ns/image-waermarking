@@ -85,3 +85,11 @@ figure;
 imshow(uint8(rgb2));
 imwrite(uint8(rgb2),'EWatermark.jpg');
 title('Extracted Watermark');
+
+% Adjust the contrast and brightness of the watermarked image
+watermarked_adjusted = imadjust(, [0 1], [0.2 0.8]);
+
+% Display the adjusted watermarked image
+figure;
+imshow(watermarked_adjusted);
+title('Adjusted Watermarked Image');
