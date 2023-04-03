@@ -1,3 +1,20 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 clc
 close all
 
@@ -32,7 +49,7 @@ blue2=img_wat(:,:,3);
 [U_imgb2,S_imgb2,V_imgb2]= svd(blue2);
 
 %watermarked
-
+key = 10
 rgbimage=imread('watermarked.jpg');
 figure;
 imshow(rgbimage);
@@ -48,9 +65,9 @@ blue3=img_w(:,:,3);
 
 
 
-S_ewatr=(S_imgr3-S_imgr1)/0.10;
-S_ewatg=(S_imgg3-S_imgg1)/0.10;
-S_ewatb=(S_imgb3-S_imgb1)/0.10;
+S_ewatr=(S_imgr3-S_imgr1)/(key*0.06);
+S_ewatg=(S_imgg3-S_imgg1)/(key*0.06);
+S_ewatb=(S_imgb3-S_imgb1)/(key*0.1);
 
 ewatr = U_imgr2*S_ewatr*V_imgr2';
 ewatg = U_imgg2*S_ewatg*V_imgg2';

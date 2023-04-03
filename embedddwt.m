@@ -49,7 +49,7 @@ blue2 = img_wat(:, :, 3);
 [U_imgb2, S_imgb2, V_imgb2] = svd(blue2);
 
 % Define a key for watermarking
-key = 12345;
+key = 10;
 
 % Watermarking:
 % Add a percentage (0.10) of the singular values of the watermark image 
@@ -83,3 +83,14 @@ imwrite(uint8(rgb2),'Watermarked.jpg');
 figure;
 imshow(uint8(rgb2));
 title('Watermarked Image');
+
+% Load the watermarked image
+
+
+% Adjust the contrast and brightness of the watermarked image
+watermarked_adjusted = imadjust(uint8(rgb2), [0 1], [0.2 0.8]);
+
+% Display the adjusted watermarked image
+figure;
+imshow(watermarked_adjusted);
+title('Adjusted Watermarked Image');
