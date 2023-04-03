@@ -16,7 +16,7 @@ numKey = bin2dec(binKey);
 for i = 1 : numel(numKey)
     numKey(i) = numKey(i) + 1 ;
 end
-
+    
 % Load the image
 img = imread('output.jpg');
 % Block size
@@ -32,14 +32,34 @@ R = img(:,:,1);
 G = img(:,:,2);
 B = img(:,:,3);
 
+% Convert each color channel into double precision
+R_double = im2double(R);
+G_double = im2double(G);
+B_double = im2double(B);
+
+% Compute the DCT coefficients of each color channel
+R_dct = dct2(R_double);
+G_dct = dct2(G_double);
+B_dct = dct2(B_double);
+
 % Divide the image into blocks
-[numRows, numCols] = size(R);
+[numRows, numCols] = size(R_dct);
 numBlocksRows = floor(numRows / blockSize);
 numBlocksCols = floor(numCols / blockSize);
 
-blocks_R = mat2cell(R, blockSize*ones(1,numBlocksRows), blockSize*ones(1,numBlocksCols), 1);
-%blocks_G = mat2cell(G_dct, blockSize*ones(1,numBlocksRows), blockSize*ones(1,numBlocksCols), 1);
-%blocks_B = mat2cell(B_dct, blockSize*ones(1,numBlocksRows), blockSize*ones(1,numBlocksCols), 1);
+blocks_R = mat2cell(R_dct, blockSize*ones(1,numBlocksRows), blockSize*ones(1,numBlocksCols), 1);
+blocks_G = mat2cell(G_dct, blockSize*ones(1,numBlocksRows), blockSize*ones(1,numBlocksCols), 1);
+blocks_B = mat2cell(B_dct, blockSize*ones(1,numBlocksRows), blockSize*ones(1,numBlocksCols), 1);
+figure;
+title('Host Image')
+for i = 1:numBlocksRows
+    for j = 1:numBlocksCols
+        idx = (i-1)*numBlocksCols + j;
+        subplot(numBlocksRows, numBlocksCols, idx);
+        imshow(blocks_R{i,j});
+    end
+end
+
 % Initialize variables for the extracted watermark
 extractedWatermark = '';
 keyIndex = 2;
@@ -47,19 +67,16 @@ keyIndex = 2;
 % Iterate over each block
 for i = 1:numBlocksRows
     for j = 1:numBlocksCols
-        % Convert red color channel into double precision
-        R_double = im2double(blocks_R{i , j});
-
-        % Compute the DCT coefficients of red color channel
-        R_dct = dct2(R_double);
-        block_R = R_dct;
+        block_R = blocks_R{i,j};
+        block_G = blocks_G{i,j};
+        block_B = blocks_B{i,j};
         
         for k = 1:blockSize
             for l = 1:blockSize
                 if keyIndex <= numel(numKey) && numKey(keyIndex) == k && numKey(keyIndex - 1) == l
                     % Extract the least significant bit from the current pixel value in block_R
                     block_R_int = uint8(block_R); % Cast to integer type
-                    watermarkBit = bitget(uint8(block_R_int(k, l)), 1);
+                    watermarkBit = bitget(block_R_int(k, l), 1);
                     % Append the watermark bit to the extractedWatermark string
                     extractedWatermark = strcat(extractedWatermark, num2str(watermarkBit));
                     % Update keyIndex

@@ -83,7 +83,7 @@ for i = 1:numBlocksRows
         for k = 1:blockSize
             for l = 1:blockSize
                 if keyIndex <= numel(numKey) && numKey(keyIndex) == k && numKey(keyIndex - 1) == l && watermarkIndex <= numel(binWatermark)
-                    watermarkBit = bitget(uint8(block_R_int(k, l)), 1);
+                    %watermarkBit = bitget(uint8(block_R_int(k, l)), 1);
                     % Append the watermark bit to the extractedWatermark string
                     beforeWatermark = strcat(beforeWatermark, num2str(watermarkBit));
                     newBit = binWatermark(watermarkIndex) ;
@@ -103,7 +103,6 @@ for i = 1:numBlocksRows
     end
 end
 
-disp('original bits');
 disp(beforeWatermark);
 %disp(extractedWatermark);
 figure;
