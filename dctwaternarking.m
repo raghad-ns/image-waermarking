@@ -265,6 +265,7 @@ psnr = 10*log10((max_pixel_value^2)/mse);
 
 % Display the PSNR value
 disp(['PSNR value is: ', num2str(psnr), ' dB']);
+
 % Display the MSE
 fprintf('The Mean Squared Error between the images is: %0.2f\n', mse)
 
@@ -275,7 +276,22 @@ img2_gray = rgb2gray(watermarked);
 
 % Calculate the SIM index
 sim = ssim(img1_gray, img2_gray);
-
 % Display the result
 fprintf('The SIM index between the two images is %f.\n', sim);
+%-------------------------------------------------------------------------------
+% Display the histograms for the original image, watermarked image, and watermark
+figure;
+subplot(3,1,1); imhist(original); title('Original Image');
+subplot(3,1,2); imhist(watermarked); title('Watermarked Image');
 
+
+% Convert text to an image
+im = uint8(zeros(100, 100)); % Create a black image with 100x100 pixels
+im = insertText(im, [25 50], text, 'FontSize', 40); % Insert text into the image
+imwrite(im, 'text.png'); % Save the image as a file
+
+% Display histogram of the text image
+im_text = imread('text.png');
+figure;
+imhist(im_text);
+title('Histogram of Text Watermark')
