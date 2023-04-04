@@ -88,7 +88,7 @@ title('Extracted Watermark');
 %-------------------------------------------------------------------------------
 % Load the original and watermarked images
 original = imread('host.jpg');
-watermarked = imread('watermarked.jpg');
+watermarked = rgbimage;
 watermark= imread('watermark.jpg');
 
 % Convert the images to double precision for calculation
@@ -127,5 +127,5 @@ fprintf('The SIM index between the two images is %f.\n', sim);
 % Display the histograms for the original image, watermarked image, and watermark
 figure;
 subplot(3,1,1); imhist(original); title('Original Image');
-subplot(3,1,2); imhist(watermark); title('Watermarke Image');
+subplot(3,1,2); imhist(watermark); title('Watermark Image');
 subplot(3,1,3); imhist(watermarked); title('Watermarked Image');

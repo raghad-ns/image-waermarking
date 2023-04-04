@@ -136,6 +136,8 @@ figure;
 imshow(img_wm);
 imwrite(img_wm, 'output.jpg', 'jpg');
 
+
+
 % stand alone extraction 
 
 % Define the key
@@ -245,7 +247,7 @@ disp(charVector);
 %----------------------------------------------------------------
 % Load the original and watermarked images
 original = imread('PeppersRGB.jpg');
-watermarked = imread('output.jpg');
+watermarked = img_wm;
 
 % Convert the images to double precision for calculation
 original = im2double(original);
@@ -286,18 +288,18 @@ subplot(3,1,2); imhist(watermarked); title('Watermarked Image');
 
 
 % Convert text to an image
-im = uint8(zeros(100, 100)); % Create a black image with 100x100 pixels
-im = insertText(im, [25 50], text, 'FontSize', 40); % Insert text into the image
-imwrite(im, 'text.png'); % Save the image as a file
+%im = uint8(zeros(100, 100)); % Create a black image with 100x100 pixels
+%im = insertText(im, [25 50], text, 'FontSize', 40); % Insert text into the image
+%imwrite(im, 'text.png'); % Save the image as a file
 
 % Display histogram of the text image
-im_text = imread('text.png');
-figure;
-imhist(im_text);
-title('Histogram of Text Watermark')
+%im_text = imread('text.png');
+%figure;
+%imhist(im_text);
+%title('Histogram of Text Watermark')
 %-------------------------------------------------------------------
 % Add Gaussian noise to the watermarked image
-noisy_img = imnoise(watermarked, 'gaussian', 0, 0.01);
+noisy_img = imnoise(watermarked, 'gaussian', 0, 0.02);
 
 % Display the original, watermarked, and noisy watermarked images side by side
 subplot(1, 3, 1);
@@ -312,6 +314,108 @@ subplot(1, 3, 3);
 imshow(noisy_img);
 title('Noisy Watermarked Image');
 
+%-------------------------------------------------------------------
+%extracting watermark from noisy image : 
+% Define the key
+key = 'hello world !!!!! hello world !!!!!!';
 
+% Convert the key to binary data
+binKey = dec2bin(uint8(key), 8);
 
+% Reshape the binary data into a 2D array with 6 columns
+binKey = reshape(binKey', [], 3);
 
+% Convert the binary data to numeric data
+numKey = bin2dec(binKey);
+for i = 1 : numel(numKey)
+    numKey(i) = numKey(i) + 1 ;
+end
+    
+% Load the image
+img = noisy_img;
+% Block size
+blockSize = 8; 
+
+% pad image to make its size evenly divisible by the block size
+padRows = blockSize - mod(size(img,1), blockSize);
+padCols = blockSize - mod(size(img,2), blockSize);
+img = padarray(img, [padRows padCols], 0, 'post');
+
+% Load the RGB image and separate its color channels
+R = img(:,:,1);
+G = img(:,:,2);
+B = img(:,:,3);
+
+% Convert each color channel into double precision
+R_double = im2double(R);
+G_double = im2double(G);
+B_double = im2double(B);
+
+% Compute the DCT coefficients of each color channel
+R_dct = dct2(R_double);
+G_dct = dct2(G_double);
+B_dct = dct2(B_double);
+
+% Divide the image into blocks
+[numRows, numCols] = size(R_dct);
+numBlocksRows = floor(numRows / blockSize);
+numBlocksCols = floor(numCols / blockSize);
+
+blocks_R = mat2cell(R_dct, blockSize*ones(1,numBlocksRows), blockSize*ones(1,numBlocksCols), 1);
+blocks_G = mat2cell(G_dct, blockSize*ones(1,numBlocksRows), blockSize*ones(1,numBlocksCols), 1);
+blocks_B = mat2cell(B_dct, blockSize*ones(1,numBlocksRows), blockSize*ones(1,numBlocksCols), 1);
+figure;
+title('Host Image')
+for i = 1:numBlocksRows
+    for j = 1:numBlocksCols
+        idx = (i-1)*numBlocksCols + j;
+        subplot(numBlocksRows, numBlocksCols, idx);
+        imshow(blocks_R{i,j});
+    end
+end
+
+% Initialize variables for the extracted watermark
+extractedWatermark = '';
+keyIndex = 2;
+
+% Iterate over each block
+for i = 1:numBlocksRows
+    for j = 1:numBlocksCols
+        block_R = blocks_R{i,j};
+        block_G = blocks_G{i,j};
+        block_B = blocks_B{i,j};
+        
+        for k = 1:blockSize
+            for l = 1:blockSize
+                if keyIndex <= numel(numKey) && numKey(keyIndex) == k && numKey(keyIndex - 1) == l
+                    % Extract the least significant bit from the current pixel value in block_R
+                    block_R_int = uint8(block_R); % Cast to integer type
+                    watermarkBit = bitget(block_R_int(k, l), 1);
+                    % Append the watermark bit to the extractedWatermark string
+                    extractedWatermark = strcat(extractedWatermark, num2str(watermarkBit));
+                    % Update keyIndex
+                    keyIndex = keyIndex + 2;
+                end
+            end
+        end
+    end
+end
+
+disp('extracted bits after adding noise');
+disp(extractedWatermark);
+
+% convert binary watermark into text 
+numChars = numel(extractedWatermark) / 8; % calculate number of characters in string
+decimalVector = zeros(1,numChars); % preallocate decimal vector
+
+% convert binary string to decimal vector
+for i = 1:numChars
+    startIdx = (i-1)*8+1;
+    endIdx = i*8;
+    decimalVector(i) = bin2dec(extractedWatermark(startIdx:endIdx));
+end
+
+% convert decimal vector to character vector
+charVector = char(decimalVector);
+disp('extracted watermark after adding noise : ');
+disp(charVector);

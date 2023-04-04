@@ -75,11 +75,11 @@ newhost_HH = wimg;
 % Reconstruct the watermarked image by performing inverse DWT on the 
 % watermarked low-low frequency coefficients along with the original 
 % low-high, high-low, and high-high frequency coefficients
-rgb2=idwt2(newhost_LH,h_LL,h_HL,h_HH,'haar');
+watermarked_rgb2=idwt2(newhost_LH,h_LL,h_HL,h_HH,'haar');
 
 watermarked = cat(3, h_LL, newhost_LH, h_HL, h_HH);
 
-imwrite(uint8(rgb2),'Watermarked.jpg');
+imwrite(uint8(watermarked_rgb2),'Watermarked.jpg');
 figure;
-imshow(uint8(rgb2));
+imshow(uint8(watermarked_rgb2));
 title('Watermarked Image');
