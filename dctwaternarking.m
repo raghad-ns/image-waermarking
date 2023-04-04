@@ -51,7 +51,7 @@ blocks_G = mat2cell(G_dct, blockSize*ones(1,numBlocksRows), blockSize*ones(1,num
 blocks_B = mat2cell(B_dct, blockSize*ones(1,numBlocksRows), blockSize*ones(1,numBlocksCols), 1);
 
 % Load the text to be embedded as a watermark and convert it to a numeric vector of double precision
-text = 'Raghad';
+text = 'mousa';
 text_double = double(text);
 
 % Convert the watermark to binary data
@@ -241,3 +241,41 @@ end
 charVector = char(decimalVector);
 disp('extracted watermark : ');
 disp(charVector);
+
+%----------------------------------------------------------------
+% Load the original and watermarked images
+original = imread('PeppersRGB.jpg');
+watermarked = imread('output.jpg');
+
+% Convert the images to double precision for calculation
+original = im2double(original);
+watermarked = im2double(watermarked);
+
+% Calculate the mean squared error (MSE) between the images
+mse = mean((original(:)-watermarked(:)).^2);
+
+% Calculate the maximum pixel value (assumes pixel values are in the range [0, 1])
+max_pixel_value = 1;
+if isinteger(original)
+    max_pixel_value = double(intmax(class(original)));
+end
+
+% Calculate the PSNR in decibels (dB)
+psnr = 10*log10((max_pixel_value^2)/mse);
+
+% Display the PSNR value
+disp(['PSNR value is: ', num2str(psnr), ' dB']);
+% Display the MSE
+fprintf('The Mean Squared Error between the images is: %0.2f\n', mse)
+
+
+% Convert the images to grayscale
+img1_gray = rgb2gray(original);
+img2_gray = rgb2gray(watermarked);
+
+% Calculate the SIM index
+sim = ssim(img1_gray, img2_gray);
+
+% Display the result
+fprintf('The SIM index between the two images is %f.\n', sim);
+
