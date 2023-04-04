@@ -295,3 +295,23 @@ im_text = imread('text.png');
 figure;
 imhist(im_text);
 title('Histogram of Text Watermark')
+%-------------------------------------------------------------------
+% Add Gaussian noise to the watermarked image
+noisy_img = imnoise(watermarked, 'gaussian', 0, 0.01);
+
+% Display the original, watermarked, and noisy watermarked images side by side
+subplot(1, 3, 1);
+imshow(original);
+title('Original Image');
+
+subplot(1, 3, 2);
+imshow(watermarked);
+title('Watermarked Image');
+
+subplot(1, 3, 3);
+imshow(noisy_img);
+title('Noisy Watermarked Image');
+
+
+
+
