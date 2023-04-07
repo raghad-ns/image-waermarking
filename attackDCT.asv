@@ -280,7 +280,7 @@ title('Noisy Watermarked Image');
 %--------------------------------------------------------------------------------
 % Load the original and watermarked images
 original = imread('PeppersRGB.jpg');
-watermarked = noisy_img;
+watermarked = img_wm;
 
 % Convert the images to double precision for calculation
 original = im2double(original);
@@ -320,7 +320,7 @@ fprintf('\n');
 % Display the histograms for the original image, watermarked image, and watermark
 figure;
 subplot(3,1,1); imhist(original); title('Original Image');
-subplot(3,1,2); imhist(noisy_img); title('Watermarked Image');
+subplot(3,1,2); imhist(watermarked); title('Watermarked Image');
 
 
 

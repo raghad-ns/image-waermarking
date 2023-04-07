@@ -175,3 +175,48 @@ figure;
 imshow(uint8(rgb2));
 imwrite(uint8(rgb2),'EWatermark.jpg');
 title('Extracted Watermark');
+%----------------------------------------------------------------------------
+% Load the original and watermarked images
+original = imread('host.jpg');
+watermarked = noisy_img ;
+watermark= imread('watermark.jpg');
+
+% Convert the images to double precision for calculation
+original = im2double(original);
+watermarked = im2double(watermarked);
+
+% Calculate the mean squared error (MSE) between the images
+mse = mean((original(:)-watermarked(:)).^2);
+
+% Calculate the maximum pixel value (assumes pixel values are in the range [0, 1])
+max_pixel_value = 1;
+if isinteger(original)
+    max_pixel_value = double(intmax(class(original)));
+end
+
+% Calculate the PSNR in decibels (dB)
+psnr = 10*log10((max_pixel_value^2)/mse);
+
+% Display the PSNR value
+disp(['PSNR value is: ', num2str(psnr), ' dB']);
+% Display the MSE
+fprintf('The Mean Squared Error between the images is: %0.2f\n', mse)
+
+
+% Convert images to double precision and grayscale
+img1 = im2double(rgb2gray(original));
+img2 = im2double(rgb2gray(watermarked));
+
+% Calculate SSIM
+ssim_value = ssim(img1, img2);
+% Display the result
+fprintf('The SIM index between the two images is %f.\n', ssim_value);
+
+
+%-------------------------------------------------------------------------------
+% Display the histograms for the original image, watermarked image, and watermark
+figure;
+subplot(3,1,1); imhist(original); title('Original Image');
+subplot(3,1,2); imhist(noisy_img); title('Watermarked Image');
+% subplot(3,1,3); imhist(watermarked); title('Watermarked Image');
+
