@@ -95,10 +95,11 @@ subplot(1, 3, 3);
 imshow(noisy_img);
 title('Noisy Watermarked Image');
 %---------------------------------------------------------------------------
-
+% Load the host image and display it
+rgbimage=imread('host.jpg');
 
 % Perform DWT on the host image and extract the low-low frequency coefficient
-[h_LL,h_LH,h_HL,h_HH]=dwt2(noisy_img,'haar');
+[h_LL,h_LH,h_HL,h_HH]=dwt2(rgbimage,'haar');
 img=h_LL;
 
 % Extract the red, green, and blue channels of the low-low frequency coefficient
@@ -113,9 +114,8 @@ blue1=img(:,:,3);
 
 % Load the watermark image and display it
 rgbimage=imread('watermark.jpg');
-figure;
-imshow(rgbimage);
-title('Watermark image');
+
+
 
 % Perform DWT on the watermark image and extract the low-low frequency coefficient
 [w_LL,w_LH,w_HL,w_HH]=dwt2(rgbimage,'haar');
@@ -134,9 +134,7 @@ blue2=img_wat(:,:,3);
 % Load the watermarked image and display it
 key = 10
 rgbimage=imread('watermarked.jpg');
-figure;
-imshow(rgbimage);
-title('Watermarked image');
+
 
 % Perform DWT on the watermarked image and extract the low-low frequency coefficient
 [wm_LL,wm_LH,wm_HL,wm_HH]=dwt2(rgbimage,'haar');
@@ -171,7 +169,6 @@ newwatermark_LL=ewat;
 rgb2=idwt2(newwatermark_LL,w_LH,w_HL,w_HH,'haar');
 
 %display the Extracted image
-figure;
-imshow(uint8(rgb2));
 imwrite(uint8(rgb2),'EWatermark.jpg');
-title('Extracted Watermark');
+
+

@@ -243,6 +243,9 @@ end
 charVector = char(decimalVector);
 disp('extracted watermark : ');
 disp(charVector);
+fprintf('\n');
+fprintf('\n');
+fprintf('\n');
 
 %----------------------------------------------------------------
 % Load the original and watermarked images
@@ -280,6 +283,10 @@ img2_gray = rgb2gray(watermarked);
 sim = ssim(img1_gray, img2_gray);
 % Display the result
 fprintf('The SIM index between the two images is %f.\n', sim);
+fprintf('\n');
+fprintf('\n');
+fprintf('\n');
+
 %-------------------------------------------------------------------------------
 % Display the histograms for the original image, watermarked image, and watermark
 figure;
@@ -300,7 +307,7 @@ subplot(3,1,2); imhist(watermarked); title('Watermarked Image');
 %-------------------------------------------------------------------
 % Add Gaussian noise to the watermarked image
 noisy_img = imnoise(watermarked, 'gaussian', 0, 0.02);
-
+figure;
 % Display the original, watermarked, and noisy watermarked images side by side
 subplot(1, 3, 1);
 imshow(original);

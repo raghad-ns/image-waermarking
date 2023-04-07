@@ -120,12 +120,14 @@ img2 = im2double(rgb2gray(watermarked));
 % Calculate SSIM
 ssim_value = ssim(img1, img2);
 % Display the result
-fprintf('The SIM index between the two images is %f.\n', sim);
+fprintf('The SIM index between the two images is %f.\n', ssim_value);
 
 
 %-------------------------------------------------------------------------------
 % Display the histograms for the original image, watermarked image, and watermark
 figure;
 subplot(3,1,1); imhist(original); title('Original Image');
-subplot(3,1,2); imhist(watermark); title('Watermark Image');
-subplot(3,1,3); imhist(watermarked); title('Watermarked Image');
+subplot(3,1,2); imhist(watermark); title('Watermarked Image');
+% subplot(3,1,3); imhist(watermarked); title('Watermarked Image');
+
+
