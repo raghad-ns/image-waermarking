@@ -220,3 +220,27 @@ subplot(3,1,1); imhist(original); title('Original Image');
 subplot(3,1,2); imhist(noisy_img); title('Watermarked Image');
 % subplot(3,1,3); imhist(watermarked); title('Watermarked Image');
 
+%---------------------------------------------------------------------------------
+fprintf('\n');
+fprintf('\n');
+I = im2double(rgb2gray(original));
+W = im2double(rgb2gray(noisy_img));
+
+dct_I = dct2(I);
+dct_W = dct2(W);
+
+dct_I_high = dct_I(1:8:end, 1:8:end);
+dct_W_high = dct_W(1:8:end, 1:8:end);
+
+mean_I = mean(dct_I_high(:));
+std_I = std(dct_I_high(:));
+
+mean_W = mean(dct_W_high(:));
+std_W = std(dct_W_high(:));
+
+
+NC = sum((dct_I_high(:) - mean_I) .* (dct_W_high(:) - mean_W)) / (std_I * std_W * numel(dct_I_high));
+
+disp(['NC = ', num2str(NC)]);
+
+

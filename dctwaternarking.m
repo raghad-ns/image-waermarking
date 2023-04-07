@@ -286,6 +286,31 @@ fprintf('The SIM index between the two images is %f.\n', sim);
 fprintf('\n');
 fprintf('\n');
 fprintf('\n');
+%------------------------------------------------------------------------------
+%for NC
+fprintf('\n');
+fprintf('\n');
+I = im2double(rgb2gray(original));
+W = im2double(rgb2gray(watermarked));
+
+dct_I = dct2(I);
+dct_W = dct2(W);
+
+dct_I_high = dct_I(1:8:end, 1:8:end);
+dct_W_high = dct_W(1:8:end, 1:8:end);
+
+mean_I = mean(dct_I_high(:));
+std_I = std(dct_I_high(:));
+
+mean_W = mean(dct_W_high(:));
+std_W = std(dct_W_high(:));
+
+
+NC = sum((dct_I_high(:) - mean_I) .* (dct_W_high(:) - mean_W)) / (std_I * std_W * numel(dct_I_high));
+
+disp(['NC = ', num2str(NC)]);
+
+
 
 %-------------------------------------------------------------------------------
 % Display the histograms for the original image, watermarked image, and watermark
