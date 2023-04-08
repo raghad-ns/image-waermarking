@@ -3,7 +3,7 @@ clc
 close all
 
 % Load the host image
-rgbimage = imread('host.jpg');
+rgbimage = imread('BaboonRGB.jpg');
 
 % Display the original image
 figure;

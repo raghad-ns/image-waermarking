@@ -2,7 +2,7 @@ clc
 close all
 
 % Load the host image and display it
-rgbimage=imread('host.jpg');
+rgbimage=imread('BaboonRGB.jpg');
 figure;
 imshow(rgbimage);
 title('Original color image');
