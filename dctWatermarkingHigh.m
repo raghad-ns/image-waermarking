@@ -72,7 +72,7 @@ end
 keyIndex = 2;
 watermarkIndex = 1;
 beforeWatermark = '';
-extractedWatermark = '';
+%extractedWatermark = '';
 % Main code starts here
 for i = numBlocksRows:-1:1
     for j = numBlocksCols:-1:1
@@ -94,9 +94,9 @@ for i = numBlocksRows:-1:1
                     blocks_R{i,j} = block_R;
                     keyIndex = keyIndex + 2 ; 
                     watermarkIndex = watermarkIndex + 1 ;
-                    watermarkBit = bitget(uint8(block_R_int(k, l)), 1);
+                    %watermarkBit = bitget(uint8(block_R_int(k, l)), 1);
                     % Append the watermark bit to the extractedWatermark string
-                    extractedWatermark = strcat(extractedWatermark, num2str(watermarkBit));
+                    %extractedWatermark = strcat(extractedWatermark, num2str(watermarkBit));
                 end
             end
         end
@@ -105,8 +105,7 @@ end
 
 disp('original bits');
 disp(beforeWatermark);
-disp('in progress extracted bits: ');
-disp(extractedWatermark);
+%disp(extractedWatermark);
 figure;
 title ('Watermarked Image')
 for i = 1:numBlocksRows
@@ -189,15 +188,6 @@ numBlocksCols = floor(numCols / blockSize);
 blocks_R = mat2cell(R_dct, blockSize*ones(1,numBlocksRows), blockSize*ones(1,numBlocksCols), 1);
 blocks_G = mat2cell(G_dct, blockSize*ones(1,numBlocksRows), blockSize*ones(1,numBlocksCols), 1);
 blocks_B = mat2cell(B_dct, blockSize*ones(1,numBlocksRows), blockSize*ones(1,numBlocksCols), 1);
-figure;
-title('Host Image')
-for i = 1:numBlocksRows
-    for j = 1:numBlocksCols
-        idx = (i-1)*numBlocksCols + j;
-        subplot(numBlocksRows, numBlocksCols, idx);
-        imshow(blocks_R{i,j});
-    end
-end
 
 % Initialize variables for the extracted watermark
 extractedWatermark = '';
@@ -245,8 +235,6 @@ charVector = char(decimalVector);
 disp('extracted watermark : ');
 disp(charVector);
 fprintf('\n');
-fprintf('\n');
-fprintf('\n');
 
 %----------------------------------------------------------------
 % Load the original and watermarked images
@@ -275,7 +263,6 @@ disp(['PSNR value is: ', num2str(psnr), ' dB']);
 % Display the MSE
 fprintf('The Mean Squared Error between the images is: %0.2f\n', mse)
 
-
 % Convert the images to grayscale
 img1_gray = rgb2gray(original);
 img2_gray = rgb2gray(watermarked);
@@ -285,8 +272,7 @@ sim = ssim(img1_gray, img2_gray);
 % Display the result
 fprintf('The SIM index between the two images is %f.\n', sim);
 fprintf('\n');
-fprintf('\n');
-fprintf('\n');
+
 %------------------------------------------------------------------------------
 %for NC
 fprintf('\n');
@@ -306,7 +292,6 @@ std_I = std(dct_I_high(:));
 mean_W = mean(dct_W_high(:));
 std_W = std(dct_W_high(:));
 
-
 NC = sum((dct_I_high(:) - mean_I) .* (dct_W_high(:) - mean_W)) / (std_I * std_W * numel(dct_I_high));
 
 disp(['NC = ', num2str(NC)]);
@@ -319,17 +304,6 @@ figure;
 subplot(3,1,1); imhist(original); title('Original Image');
 subplot(3,1,2); imhist(watermarked); title('Watermarked Image');
 
-
-% Convert text to an image
-%im = uint8(zeros(100, 100)); % Create a black image with 100x100 pixels
-%im = insertText(im, [25 50], text, 'FontSize', 40); % Insert text into the image
-%imwrite(im, 'text.png'); % Save the image as a file
-
-% Display histogram of the text image
-%im_text = imread('text.png');
-%figure;
-%imhist(im_text);
-%title('Histogram of Text Watermark')
 %-------------------------------------------------------------------
 % Add Gaussian noise to the watermarked image
 noisy_img = imnoise(watermarked, 'gaussian', 0, 0.02);
@@ -397,15 +371,6 @@ numBlocksCols = floor(numCols / blockSize);
 blocks_R = mat2cell(R_dct, blockSize*ones(1,numBlocksRows), blockSize*ones(1,numBlocksCols), 1);
 blocks_G = mat2cell(G_dct, blockSize*ones(1,numBlocksRows), blockSize*ones(1,numBlocksCols), 1);
 blocks_B = mat2cell(B_dct, blockSize*ones(1,numBlocksRows), blockSize*ones(1,numBlocksCols), 1);
-figure;
-title('Host Image')
-for i = 1:numBlocksRows
-    for j = 1:numBlocksCols
-        idx = (i-1)*numBlocksCols + j;
-        subplot(numBlocksRows, numBlocksCols, idx);
-        imshow(blocks_R{i,j});
-    end
-end
 
 % Initialize variables for the extracted watermark
 extractedWatermark = '';
